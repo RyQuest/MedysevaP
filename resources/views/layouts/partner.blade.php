@@ -138,6 +138,14 @@
                             <span class="title">VLE List</span>
                         </a>
                     </li>
+                    
+                    <li class="">
+                        <a href="{{route('user.vle')}}">
+                            <i class="fa fa-area-chart" aria-hidden="true"></i>
+                            <span class="title">VLE Session</span>
+                        </a>
+                    </li>
+                    
                       <li class="">
                         <a href="{{route('user.wallet')}}">
                             <i class="fa fa-money" aria-hidden="true"></i>
@@ -146,7 +154,7 @@
                     </li>
                     <li class="">
                         <a href="{{route('user.withdrawRequest')}}">
-                            <i class="fa fa-money" aria-hidden="true"></i>
+                            <i class="fa fa-vcard-o" aria-hidden="true"></i>
                             <span class="title">Withdraw Request</span>
                         </a>
                     </li>
@@ -187,13 +195,13 @@
                     
                      <li class="">
                         <a href="/invoice/nict">
-                            <i class="fa fa-list"></i>
+                            <i class="fa fa-file"></i>
                             <span class="title">NICT INVOICES</span>
                         </a>
                     </li>
                     <li class="">
                         <a href="/wallet/topup">
-                            <i class="fa fa-list"></i>
+                            <i class="fa fa-address-book"></i>
                             <span class="title">Topup Request</span>
                         </a>
                     </li>

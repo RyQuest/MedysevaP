@@ -13,7 +13,11 @@ use App\Models\TrHistory;
 use App\Models\UserWallet;
 use App\Mail\VleRegister;
 use App\Models\PartnerInvoice;
+use App\Models\VleLoginCount;
+
 use App\Imports\VleImport;
+use App\Exports\VleSessionExport;
+
 
 class VleController extends Controller
 {
@@ -68,7 +72,7 @@ class VleController extends Controller
         }
         $vleUser = VleUser::where('chamber_id',$chamber_id)->count();
         if($vleUser > 1){
-            //  return redirect()->back()->withError('VLE already added into chamber')->withInput();
+             return redirect()->back()->withError('VLE already added into chamber')->withInput();
         }
         $adhar_front = "";
         $adhar_back = "";
@@ -225,8 +229,45 @@ class VleController extends Controller
             abort(404);
         }
         $data['data'] = $vle;
+        $data['loginData'] = VleLoginCount::where('user_id',$vle->id)->get();
         return view('user.vle.view',$data);
         
+    }
+    
+    
+    public function VleSession(Request $request){
+        $user_id = $request->get('user');
+        if($request->get('start_date') && $request->get('end_date')){
+            \Session::put('export_start_date',$request->get('start_date'));
+            \Session::put('export_end_date',$request->get('end_date'));
+            return \Excel::download(new VleSessionExport(), 'vle_session.xlsx');
+        }
+        if($user_id){
+            $data['data'] = VleLoginCount::select('session_count.id','ip_address','user_id','vle_users.name','session_count.created_at as date', \DB::raw('DATE_FORMAT(session_count.created_at, "%Y-%m-%d") as created_at'), \DB::raw('count(session_count.id) as total'))
+            ->join('vle_users','vle_users.id','=','session_count.user_id')
+                 ->where('user_id',$user_id)
+                 ->groupBy(['user_id','created_at'])
+                 ->get();
+        } else{
+            $data['data'] = VleLoginCount::select('session_count.id','ip_address','user_id','vle_users.name','session_count.created_at as date', \DB::raw('DATE_FORMAT(session_count.created_at, "%Y-%m-%d") as created_at'), \DB::raw('count(session_count.id) as total'))
+            ->join('vle_users','vle_users.id','=','session_count.user_id')
+                 ->groupBy(['user_id','created_at'])
+                 ->get();
+        }
+    
+        return view('user.vle.sessionList',$data);
+    }
+    
+    public function viewVleSession(Request $request,$id,$date){
+        if($request->get('start_date') && $request->get('end_date')){
+            \Session::put('export_start_date',$request->get('start_date'));
+            \Session::put('export_end_date',$request->get('end_date'));
+            return \Excel::download(new VleSessionExport(), 'vle_session.xlsx');
+        }
+        
+        $data['vle'] = VleUser::find($id);
+        $data['data'] = VleLoginCount::where('user_id',$id)->whereDate('created_at',$date)->get();
+        return view('user.vle.viewSession',$data);
     }
 }
 

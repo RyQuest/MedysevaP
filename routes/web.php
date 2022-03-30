@@ -78,6 +78,9 @@ Route::group(['middleware' => 'web'], function () {
             Route::get('add','VleController@add')->name('vleAdd');
             Route::post('create','VleController@create')->name('vleCreate');
             Route::get('view/{id}','VleController@viewVle')->name('vleView');
+            Route::get('session/{id}/{date}','VleController@viewVleSession')->name('viewVleSession');
+            Route::get('session','VleController@VleSession')->name('VleSession');
+
         });
         Route::prefix('patient')->group(function(){
             Route::get('/','PatientController@index')->name('patient');

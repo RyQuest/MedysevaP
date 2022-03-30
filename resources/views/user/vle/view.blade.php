@@ -98,6 +98,41 @@
             </div>
         </div>
     </section>
+    
+    
+    <!-- Login session-->
+    
+     <section class="box inner-list-box">
+        <header class="panel_header inner-page-header">
+            <h2 class="title pull-left">VLE Sessions ({{count($loginData)}})</h2>
+        </header>
+        <div class="content-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    @if(isset($loginData))
+                    <table id="list-table" class="table vm table-small-font no-mb table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <td>Ip Address</td>
+                                <td>Date</td>
+                            </tr>    
+                        </thead>
+                        <tbody>
+                            @foreach($loginData as $value)
+                            <tr>
+                                <td>{{$value->ip_address}}</td>
+                                <td>{{date('d F,Y',strtotime($value->date))}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    @else
+                    <h5>No activity yet.</h5>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 

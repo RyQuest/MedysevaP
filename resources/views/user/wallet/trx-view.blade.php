@@ -23,17 +23,16 @@
                                     {{ $data->amount }}
                                 </td>
                             </tr>
-                                <td>Vle Referral</td>
-                                <td>
-                                    0
-                                </td>
+                            <tr>
+                                <td>From</td>
+                                <td>{{getUsername($data->from_wallet)}}</td>
                             </tr>
-                                <td>Partner Referral</td>
-                                <td>
-                                    0
-                                </td>
+                            <tr>
+                                <td>To</td>
+                                <td>{{getUsername($data->to_wallet)}}</td>
                             </tr>
-                                <td>Medyseva Referral</td>
+                            <tr>
+                                <td>Medyseva Amount</td>
                                 <td>
                                     {{ $data->amount }}
                                 </td>
@@ -52,19 +51,49 @@
                                     {{ $data->amount }}
                                 </td>
                             </tr>
-                                <td>Vle Referral</td>
+                            <tr>
+                                <td>From</td>
+                                <td>{{getUsername($data->from_wallet)}}</td>
+                            </tr>
+                            <tr>
+                                <td>To</td>
+                                <td>{{getUsername($data->to_wallet)}}</td>
+                            </tr>
+                            <tr>
+                                <td>VLE Name</td>
                                 <td>
-                                    0
+                                    <?php 
+                                        $vleUser = vleUser($data->vle_id);
+                                        if($vleUser){
+                                            echo $vleUser->name;
+                                        }
+                                    ?>
                                 </td>
                             </tr>
-                                <td>Partner Referral</td>
+                                <td>TDS</td>
                                 <td>
+                                    <?php 
+                                        $trxInfo = trxInfo($data->vle_id,$data->trx_id,'tds');
+                                        if($trxInfo){
+                                            echo $trxInfo->amount;    
+                                        }
+                                    ?>
+                                </td>
+                            </tr>
+                                <td>Partner Amount</td>
+                                <td>
+                                    @if($trxInfo)
+                                    {{$data->amount - $trxInfo->amount}}
+                                    @else
                                     {{$data->amount}}
+                                    @endif
                                 </td>
                             </tr>
-                                <td>Medyseva Referral</td>
+                                <td>Medyseva Amount</td>
                                 <td>
-                                    0
+                                   @if($trxInfo)
+                                        {{$trxInfo->amount}}
+                                    @endif
                                 </td>
                             </tr>
                             @elseif($data->category == "tds" )
@@ -75,21 +104,43 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td>From</td>
+                                <td>{{getUsername($data->from_wallet)}}</td>
+                            </tr>
+                            <tr>
+                                <td>To</td>
+                                <td>{{getUsername($data->to_wallet)}}</td>
+                            </tr>
+                            
+                            <tr>
                                 <td>Total Amount</td>
+                                <td>
+                                    <?php 
+                                        $trxInfo = trxInfo($data->vle_id,$data->trx_id,'register_invoice');
+                                        if($trxInfo){
+                                            echo $trxInfo->amount;    
+                                        }
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>TDS</td>
                                 <td>
                                     {{ $data->amount }}
                                 </td>
                             </tr>
-                                <td>Vle Referral</td>
+                            <tr>
+                                <td>VLE Name</td>
                                 <td>
-                                    0
+                                    <?php 
+                                        $vleUser = vleUser($data->vle_id);
+                                        if($vleUser){
+                                            echo $vleUser->name;
+                                        }
+                                    ?>
                                 </td>
                             </tr>
-                                <td>Partner Referral</td>
-                                <td>
-                                    0
-                                </td>
-                            </tr>
+                            <tr>
                                 <td>Medyseva Referral</td>
                                 <td>
                                     {{$data->amount}}
@@ -108,17 +159,16 @@
                                     {{ $data->amount }}
                                 </td>
                             </tr>
-                                <td>Vle Referral</td>
-                                <td>
-                                    0
-                                </td>
+                            <tr>
+                                <td>From</td>
+                                <td>{{getUsername($data->from_wallet)}}</td>
                             </tr>
-                                <td>Partner Referral</td>
-                                <td>
-                                    0
-                                </td>
+                            <tr>
+                                <td>To</td>
+                                <td>{{getUsername($data->to_wallet)}}</td>
                             </tr>
-                                <td>Medyseva Referral</td>
+                            </tr>
+                                <td>Medyseva Amount</td>
                                 <td>
                                     {{$data->amount}}
                                 </td>
@@ -150,6 +200,25 @@
                                             <?php $totalPaid = $value->amount;?>
                                         @endif
                                     @endforeach
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>From</td>
+                                <td>{{getUsername($data->from_wallet)}}</td>
+                            </tr>
+                            <tr>
+                                <td>To</td>
+                                <td>{{getUsername($data->to_wallet)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Patient Name</td>
+                                <td>
+                                    <?php 
+                                        $patient = patientData($data->patient_id);
+                                        if($patient){
+                                            echo $patient->name;
+                                        }
+                                    ?>
                                 </td>
                             </tr>
                             <tr>

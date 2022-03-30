@@ -48,8 +48,8 @@
                                  <tr>
                                     
                                     <td>#{{$value->id}}</td>
-                                    <td>Medyseva</td>
-                                    <td>{{auth()->user()->name}}</td>
+                                    <td>{{getUsername($value->from_wallet)}}</td>
+                                    <td>{{getUsername($value->to_wallet)}}</td>
                                     <td>
                                         @if($value->category == "appointment")
                                         Appointment Book

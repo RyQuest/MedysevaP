@@ -50,10 +50,10 @@
                                 ?>
                                  <tr>
                                     <td>
-                                        <div class="round round-{{$listColor}}">S</div>
-                                        <div class="designer-info">
+                                        <!--<div class="round round-{{$listColor}}">S</div>-->
+                                        <!--<div class="designer-info">-->
                                             <h6>{{$value->name}}</h6>
-                                        </div>
+                                        <!--</div>-->
                                     </td>
                                     <td>{{$value->email}}</td>
                                     <td>
@@ -66,7 +66,8 @@
                                     <td>{{userAalletAmount($value->id,'vle')}}</td>
                                     <td>{{date('Y-m-d',strtotime($value->created_at))}}</td>
                                     <td>
-                                        <a href="{{route('user.vleView',$value->id)}}">View</a>
+                                        <a href="{{route('user.vleView',$value->id)}}" class="btn btn-primary">View</a>
+                                        <a href="{{route('user.VleSession')}}?user={{$value->id}}" class="btn btn-success">View Session</a>
                                     </td>
                                 </tr>
                                 @endforeach

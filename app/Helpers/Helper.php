@@ -34,8 +34,25 @@ function patientInfo($id){
     return $user;
 }
 
+function getUsername($wallet_id){
+    $wallet = \App\Models\UserWallet::where('id',$wallet_id)->first();
+    if($wallet){
+        if($wallet->user_role == "vle"){
+            $data = vleUser($wallet->user_id);
+            return $data->name;
+        } else{
+            $data = getuser($wallet->user_id);
+            return $data->name;
+        }
+    }
+}
 function getuser($id){
     $user = \App\Models\User::where('id',$id)->first();
+    return $user;
+}
+
+function patientData($id){
+    $user = \App\Models\Patients::where('id',$id)->first();
     return $user;
 }
 
@@ -54,5 +71,9 @@ function addressProof($value){
 function loginUserWallet(){
      $wallet = \App\Models\UserWallet::where('user_id',auth()->user()->id)->where('user_role','partner')->first();
      return $wallet;
+}
+
+function trxInfo($vle_id,$trx_id,$category){
+    return \App\Models\TrHistory::where('trx_id',$trx_id)->where('category',$category)->where('vle_id',$vle_id)->first();
 }
 ?>
