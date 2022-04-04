@@ -18,13 +18,28 @@ class PartnerInvoiceImport implements FromCollection,WithHeadings
         $export_start_date = \Session::get('export_start_date');
         $export_end_date = \Session::get('export_end_date');
         if($export_start_date && $export_end_date){
-            return PartnerInvoice::select('amount','gst','total','status')->whereBetween('created_at', [$export_start_date, $export_end_date])->get();
+            $data = PartnerInvoice::select('partner_invoices.*','vle_users.name')
+                ->join('vle_users','vle_users.id','=','partner_invoices.vle_id')
+                ->whereBetween('partner_invoices.created_at', [$export_start_date, $export_end_date])->get();
+                
+            $result = array();
+            foreach($data as $key => $value){
+                $d['name'] = $value->name;
+                $d['amount'] = $value->amount;
+                $d['gst'] = $value->gst;
+                $d['total'] = $value->total;
+                $d['approve_date'] = $value->approve_date ? date('Y-m-d H:i:s',strtotime($value->approve_date)) : "";
+                $d['date'] = date('Y-m-d H:i:s',strtotime($value->created_at));
+                $d['status'] = $value->status;
+                $result[] = $d;
+            }
+            return collect($result);
         }
-        return PartnerInvoice::select('amount','gst','total','status')->get();
+       
     }
 
     public function headings(): array
     {
-        return ['Amount','GST','Total','Status'];
+        return ['VLE Name','Amount','GST','Total','Approve Date','Date','Status'];
     }
 }

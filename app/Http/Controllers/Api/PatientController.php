@@ -99,6 +99,8 @@ class PatientController extends Controller
     
     public function gethealthframefromscanidandCID($scan_id,$cid){
         try{
+            // \Log::info($scan_id);
+            // \Log::info($cid);
             $client = new \GuzzleHttp\Client();
             $call = "https://dev-main.abhayparimitii.cloudns.asia/userdata/gethealthframefromscanidandCID/".$scan_id."/".$cid;
             $request = $client->get($call);

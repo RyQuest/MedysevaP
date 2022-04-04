@@ -140,7 +140,7 @@
                     </li>
                     
                     <li class="">
-                        <a href="{{route('user.vle')}}">
+                        <a href="/vle/session">
                             <i class="fa fa-area-chart" aria-hidden="true"></i>
                             <span class="title">VLE Session</span>
                         </a>
@@ -203,6 +203,13 @@
                         <a href="/wallet/topup">
                             <i class="fa fa-address-book"></i>
                             <span class="title">Topup Request</span>
+                        </a>
+                    </li>
+                    
+                    <li class="">
+                        <a href="{{route('user.password')}}">
+                            <i class="fa fa-lock"></i>
+                            <span class="title">Change Password</span>
                         </a>
                     </li>
                     

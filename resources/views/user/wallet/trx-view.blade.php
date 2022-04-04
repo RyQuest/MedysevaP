@@ -96,7 +96,61 @@
                                     @endif
                                 </td>
                             </tr>
-                            @elseif($data->category == "tds" )
+                            @elseif($data->category == "tds" && $data->appointment_id || $data->invoice_id)
+                            <tr>
+                                <td>Transaction Type</td>
+                                <td>
+                                    Referral TDS
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>From</td>
+                                <td>{{getUsername($data->from_wallet)}}</td>
+                            </tr>
+                            <tr>
+                                <td>To</td>
+                                <td>{{getUsername($data->to_wallet)}}</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>Total Amount</td>
+                                <td>
+                                    <?php
+                                    $type = "invoice";
+                                    if($data->appointment_id){
+                                        $type = "appointment";
+                                    }
+                                        $trxInfo = trxInfo($data->vle_id,$data->trx_id,$type);
+                                        if($trxInfo){
+                                            echo $trxInfo->amount;    
+                                        }
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>TDS</td>
+                                <td>
+                                    {{ $data->amount }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Patient Name</td>
+                                <td>
+                                    <?php 
+                                        $patient = patientData($data->patient_id);
+                                        if($patient){
+                                            echo $patient->name;
+                                        }
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Medyseva Referral</td>
+                                <td>
+                                    {{$data->amount}}
+                                </td>
+                            </tr>
+                            @elseif($data->category == "tds")
                             <tr>
                                 <td>Transaction Type</td>
                                 <td>

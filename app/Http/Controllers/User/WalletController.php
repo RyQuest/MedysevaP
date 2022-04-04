@@ -257,6 +257,7 @@ class WalletController extends Controller
         return redirect()->back()->withSuccess('Topup request approved sucessfully');
         } catch(\Exception $ex){
             \DB::rollback();
+            // dd($ex->getLine());
              return redirect()->back()->withError($ex->getMessage());
         }
        

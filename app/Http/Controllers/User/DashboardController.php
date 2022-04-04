@@ -148,6 +148,33 @@ class DashboardController extends Controller
         return response(['status' => 1,'data' => array_values($patientGraph),'patientGraphDay' => array_values($patientGraphDay)]);
         
     }
+    
+    public function password(){
+        return view('user.password');    
+    }
+    
+    public function passwordUpdate(Request $request){
+        $validator = \Validator::make($request->all(),[
+            'old_password' => 'required',
+            'password' => 'confirmed|required',
+            'password_confirmation' => 'required',
+        ]);
+        if($validator->fails()){
+            return redirect()->back()->withErrors($validator->errors())->withInput();
+        }
+        
+        $user = auth()->user();
+        
+        if (\Hash::check($request->get('old_password'), $user->password)) { 
+            $user = User::find(auth()->user()->id);
+            $user->password = \Hash::make($request->get('password'));
+            $user->save();
+            return redirect()->back()->withSuccess('Password updated successfully')->withInput();
+        } else{
+            return redirect()->back()->withError('Old Password does not match')->withInput();
+        }
+    }
+    
     public function logout(){
         \Auth::logout();
         return redirect()->to('signin');

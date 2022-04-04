@@ -53,12 +53,13 @@
                      <!--<img src="data/icons/padlock.png" alt="login-icon" style="max-width:64px">-->
                      <img src="/assets/images/login-logo.png" alt="login-icon" >
                      <div class="login-header">
-                         <h4 class="bold color-white">Login Now!</h4>
-                         <h4><small>Please enter your credentials to login.</small></h4>
+                         <h4 class="bold color-white">Reset Password!</h4>
+                         <h4><small>Please enter your email address.</small></h4>
                      </div>
                 </div>
                
                 <div class="box login">
+                    
                     @if(\Session::has('success'))
                     <div class="alert alert-success">
                         <p class="mb-0">{{\Session::get('success')}}</p>
@@ -69,9 +70,10 @@
                         <p class="mb-0">{{\Session::get('error')}}</p>
                     </div>
                     @endif
+                    
                     <div class="content-body" style="padding-top:30px">
 
-                        <form id="msg_validate" action="{{route('user-login')}}" method="post" novalidate="novalidate" class="no-mb no-mt">
+                        <form id="msg_validate" action="{{route('user-resetPassword')}}" method="post" novalidate="novalidate" class="no-mb no-mt">
                             @csrf
                             <div class="row">
                                 <div class="col-xs-12">
@@ -86,18 +88,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label">Password</label>
-                                        <div class="controls">
-                                            <input type="password" name="password" class="form-control" placeholder="password">
-                                            @if($errors->has('password'))
-                                                <div class="error">{{ $errors->first('password') }}</div>
-                                            @endif
-                                        </div>
-                                    </div>
-
                                     <div class="pull-left">
-                                        <button type="submit" class="btn btn-primary mt-10 btn-corner right-15">Log in</button>
+                                        <button type="submit" class="btn btn-primary mt-10 btn-corner right-15">Reset</button>
                                         
                                     </div>
 
@@ -108,7 +100,7 @@
                 </div>
 
                 <p id="nav">
-                    <a class="pull-left" href="/forgot-password" title="Password Lost and Found">Forgot password?</a>
+                    <a class="pull-left" href="/signin" title="Password Lost and Found">Login</a>
                     
                 </p>
 

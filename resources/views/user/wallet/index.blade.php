@@ -91,7 +91,6 @@
                                         @endif
                                         {!! $username !!}
                                     </td>
-                                    <td>{{$value->amount}}</td>
                                     <td>
                                         <?php 
                                         $loginUserWallet = loginUserWallet();
@@ -102,6 +101,7 @@
                                         }
                                         ?>
                                     </td>
+                                    <td>{{$value->amount}}</td>
                                     <td>{{ $loginUserWallet->id == $value->from_wallet ? $value->current_amount : $value->receiver_amount}}</td>
                                     <td>{{date('Y-m-d H:i:s',strtotime($value->created_at))}}</td>
                                     <td><a href="{{route('user.viewTrx',$value->id)}}" class="btn btn-primary">View</a></td>

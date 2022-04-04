@@ -53,6 +53,12 @@ Route::get('/dump-autoload', function() {
 Route::get('home',function(){
     // dd(\Auth::user());
 });
+
+Route::get('testemai',function(){
+    $vleCreate = App\Models\VleUser::find(23);
+    \Mail::to('pawanpatidar@questglt.com')->send(new App\Mail\VleRegister($vleCreate));
+});
+
 Route::group(['middleware' => 'web'], function () {
     Route::get('/speciality','ApiController@index');
     Route::match(['post'],'/appointment','ApiController@store');
@@ -60,10 +66,16 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('signin','User\LoginController@index');
     Route::post('signin','User\LoginController@login')->name('user-login');
     
+    Route::get('forgot-password','User\LoginController@forgotPassword')->name('user-password-forgot');
+    Route::post('reset-password','User\LoginController@resetPassword')->name('user-resetPassword');
+    
     Route::name('user.')->middleware('checkLogin')->namespace('User')->group(function () {
         Route::get('dashboard','DashboardController@index')->name('dashboard');
         Route::get('dashboard/vle-graph','DashboardController@dashboardVleGraph')->name('dashboardVleGraph');
         Route::get('dashboard/clinic-graph','DashboardController@dashboardClinicGraph')->name('$monthData');
+        
+        Route::get('password','DashboardController@password')->name('password');
+        Route::post('password','DashboardController@passwordUpdate')->name('passwordUpdate');
         
         Route::get('logout','DashboardController@logout')->name('logout');
         Route::prefix('invoice')->group(function(){
