@@ -16,8 +16,11 @@ class WithdrawRequestImport implements FromCollection,WithHeadings
     {
         $export_start_date = \Session::get('export_start_date');
         $export_end_date = \Session::get('export_end_date');
+        
+        $user_id = auth()->user()->id;
+        
         if($export_start_date && $export_end_date){
-            return WithdrawRequest::select('vle_users.name','amount','status','approve_date','bank_narration','utr_no','date_of_payment','withdraw_request.created_at')->join('vle_users','vle_users.id','=','withdraw_request.user_id')->whereBetween('withdraw_request.created_at', [$export_start_date, $export_end_date])->get();
+            return WithdrawRequest::select('vle_users.name','amount','status','approve_date','bank_narration','utr_no','date_of_payment','withdraw_request.created_at')->join('vle_users','vle_users.id','=','withdraw_request.user_id')->whereBetween('withdraw_request.created_at', [$export_start_date, $export_end_date])->where('added_by',$user_id)->where('added_by_role','partner')->get();
         }
         return WithdrawRequest::select('vle_users.name','amount','status','approve_date','bank_narration','utr_no','date_of_payment')->join('vle_users','vle_users.id','=','withdraw_request.user_id')->get();
     }

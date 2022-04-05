@@ -32,7 +32,11 @@ class WalletController extends Controller
             return \Excel::download(new WithdrawRequestImport(), 'withdraw_request.xlsx');
         }
         
-        $data['data'] = WithdrawRequest::latest()->get();
+        $data['data'] = WithdrawRequest::select('withdraw_request.*','vle_users.id as vle_id')
+            ->join('vle_users','vle_users.id','=','withdraw_request.user_id')
+            ->where('vle_users.added_by_role','partner')
+            ->where('vle_users.added_by',auth()->user()->id)
+            ->latest()->get();
         return view('user.wallet.request',$data);
     }
     
@@ -199,6 +203,8 @@ class WalletController extends Controller
         }
         $data['data'] = TopupRequest::select('topup_request.*','vle_users.name')
         ->join('vle_users','vle_users.id','=','topup_request.user_id')
+        ->where('vle_users.added_by',auth()->user()->id)
+        ->where('vle_users.added_by_role','partner')
         ->latest()
         ->get();
         return view('user.wallet.topup_request',$data);
