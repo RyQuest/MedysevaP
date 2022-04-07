@@ -25,6 +25,7 @@ Route::get('gettotalscansfrommobile/{mobile}', [App\Http\Controllers\Api\Patient
 
 Route::get('gethealthframefromscanidandCID/{scan_id}/{mobile}', [App\Http\Controllers\Api\PatientController::class, 'gethealthframefromscanidandCID']);
 
+
 Route::prefix('company')->group(function () {
     Route::get('getall',[App\Http\Controllers\Api\CompanyController::class, 'index']);
     Route::post('create',[App\Http\Controllers\Api\CompanyController::class, 'create']);
@@ -41,6 +42,8 @@ Route::post('patient/forgot-password', 'Api\Patient\AuthController@forgot_passwo
 Route::post('patient/reset', 'Api\Patient\AuthController@reset');
 
 Route::post('patient/register', 'Api\Patient\AuthController@register');
+Route::post('doctor/register', 'Api\Doctor\AuthController@register');
+Route::post('contact', 'Api\Patient\AuthController@contact');
 
 Route::group(['middleware' => 'auth.jwt'], function () {
     
@@ -49,6 +52,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::post('patient/logout', 'Api\Patient\AuthController@logout');
     Route::get('patient/profile/', 'Api\Patient\AuthController@getAuthUser');
     Route::post('patient/profile/update/{id}', 'Api\Patient\HomeController@profileUpdate');
+    Route::post('patient/changepass/', 'Api\Patient\HomeController@changepass');
     Route::get('patient/appointments/', 'Api\Patient\HomeController@appointments');
     
 });
