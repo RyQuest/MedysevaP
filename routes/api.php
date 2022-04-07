@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\VleController;
+use App\Http\Controllers\Api\WalletController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -55,4 +58,39 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::post('patient/changepass/', 'Api\Patient\HomeController@changepass');
     Route::get('patient/appointments/', 'Api\Patient\HomeController@appointments');
     
+});
+
+
+/* dev@ashish 2022-04-07 */
+
+Route::prefix('vle')->group(function(){
+    Route::post('getall',   [VleController::class, 'index']);
+    Route::post('chambers', [VleController::class, 'chambers']);
+    Route::post('create',   [VleController::class, 'create']);
+    Route::post('view',     [VleController::class, 'viewVle']);
+    Route::post('session',   [VleController::class, 'VleSession']);
+    Route::post('session/view',[VleController::class, 'viewVleSession']);
+});
+
+
+Route::prefix('wallet')->group(function(){
+    Route::post('getall', [WalletController::class, 'index'] );
+    Route::post('transactions', [WalletController::class, 'transactions']);
+    Route::post('transactions/view',[WalletController::class, 'viewTrx']);
+    Route::post('/request',[WalletController::class, 'withdrawRequest']);
+
+    // Route::post('/request/view/{id}','WalletController@withdrawRequestView');
+    
+    // Route::post('request-approval-data','WalletController@approvalConfirm');
+    
+    // Route::post('/request/approve','WalletController@withdrawRequestApprove');
+    // Route::post('request/reject','WalletController@withdrawRequestReject');
+    // Route::post('request/reason','WalletController@viewRejectReason');
+    // Route::post('transactions','WalletController@transactions');
+    // Route::post('transactions/view/{id}','WalletController@viewTrx');
+    
+    // Route::post('topup','WalletController@topupRequest');
+    // Route::post('topup/{id}','WalletController@topupRequestView');
+    // Route::post('topupRequestReject','WalletController@topupRequestReject');
+    // Route::post('approveTopupRequest','WalletController@approveTopupRequest');
 });
