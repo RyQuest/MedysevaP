@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\VleController;
 use App\Http\Controllers\Api\WalletController;
+use App\Http\Controllers\Api\InvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,19 +79,22 @@ Route::prefix('wallet')->group(function(){
     Route::post('transactions', [WalletController::class, 'transactions']);
     Route::post('transactions/view',[WalletController::class, 'viewTrx']);
     Route::post('/request',[WalletController::class, 'withdrawRequest']);
+    Route::post('/request/view',[WalletController::class, 'withdrawRequestView']);
+    Route::post('request-approval-data', [WalletController::class, 'approvalConfirm']);
+    Route::post('/request/approve', [WalletController::class, 'withdrawRequestApprove']);
+    Route::post('request/reject', [WalletController::class, 'withdrawRequestReject']);
+    Route::post('request/reason', [WalletController::class, 'viewRejectReason']);
+    Route::post('topup', [WalletController::class, 'topupRequest']);
+    Route::post('topup/view', [WalletController::class, 'topupRequestView'] );
+    Route::post('topupRequestReject', [WalletController::class, 'topupRequestReject']);
+    Route::post('approveTopupRequest', [WalletController::class, 'approveTopupRequest'] );
+});
 
-    // Route::post('/request/view/{id}','WalletController@withdrawRequestView');
-    
-    // Route::post('request-approval-data','WalletController@approvalConfirm');
-    
-    // Route::post('/request/approve','WalletController@withdrawRequestApprove');
-    // Route::post('request/reject','WalletController@withdrawRequestReject');
-    // Route::post('request/reason','WalletController@viewRejectReason');
-    // Route::post('transactions','WalletController@transactions');
-    // Route::post('transactions/view/{id}','WalletController@viewTrx');
-    
-    // Route::post('topup','WalletController@topupRequest');
-    // Route::post('topup/{id}','WalletController@topupRequestView');
-    // Route::post('topupRequestReject','WalletController@topupRequestReject');
-    // Route::post('approveTopupRequest','WalletController@approveTopupRequest');
+
+Route::prefix('invoice')->group(function(){
+    Route::post('getall', [InvoiceController::class, 'index']);
+    Route::post('/view',[InvoiceController::class, 'view']);
+    Route::post('/nict',[InvoiceController::class, 'createNICTInvoice']);
+    Route::post('transactions', [InvoiceController::class ,'transactions']);
+    // Route::post('/request-amount','InvoiceController@saveNictInvoiceData');
 });

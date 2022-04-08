@@ -63,13 +63,19 @@ class WalletController extends Controller
         
         return response(['status' => 1,'data' => $data]);
     }
+
+
     public function withdrawRequestApprove(Request $reqeust){
-        $id = $reqeust->get('id');
+
+        $id = $request->input('withdraw_request_id');
+
         $result = WithdrawRequest::find($id);
         $wallet = UserWallet::find($result->wallet_id);
+        
         if($wallet->amount < $result->amount){
-            return redirect()->back()->withError('User wallet does not have sufficient balance');
+            return response(['status' => 1,'data' => [], 'msg' =>['error'=>['User wallet does not have sufficient balance.']] ]);
         }
+        
         $tds = 10;
         $medySevaTds = 0;
         if($result->amount > 15000){
@@ -112,13 +118,13 @@ class WalletController extends Controller
        
         
         TrHistory::create([
-            'wallet_id' =>  $result->wallet_id,
-            'user_id' =>  $result->user_id,
-            'from_wallet' => $result->wallet_id,
-            'to_wallet' => 0,
-            'user_role' => $result->user_role,
-            'amount' => $result->amount - $medySevaTds,
-            'category' => 'withdraw',
+            'wallet_id'     => $result->wallet_id,
+            'user_id'       => $result->user_id,
+            'from_wallet'   => $result->wallet_id,
+            'to_wallet'     => 0,
+            'user_role'     => $result->user_role,
+            'amount'        => $result->amount - $medySevaTds,
+            'category'      => 'withdraw',
             'current_amount' => ($wallet->amount - $result->amount),
         ]);
         
@@ -139,21 +145,21 @@ class WalletController extends Controller
         $result->date_of_payment = $reqeust->get('date_of_payment');
         $result->save();
         
-        return redirect()->back()->withSuccess('Withdraw request approved sucessfully');
+        return response(['status' => 1,'data' => $result ]);
     }
     
     public function withdrawRequestReject(Request $request){
-         $result = WithdrawRequest::find($request->get('id'));
-         $result->reason = $request->get('reason');
-         $result->approve_date = date('Y-m-d H:i:s');
-         $result->status = 'rejected';
-         $result->save();
-         return redirect()->back()->withSuccess('Withdraw request rejected sucessfully');
+        $result = WithdrawRequest::find($request->get('withdraw_request_id'));
+        $result->reason = $request->get('reason');
+        $result->approve_date = date('Y-m-d H:i:s');
+        $result->status = 'rejected';
+        $result->save();
+        return response(['status' => 1,'data' => $result]);
     }
     
     public function viewRejectReason(Request $request){
-        $id = $request->get('id');
-        $wallet = WithdrawRequest::find($request->get('id'));
+        $id = $request->get('withdraw_request_id');
+        $wallet = WithdrawRequest::find($request->get('withdraw_request_id'));
         return response(['status' => 1,'data' => $wallet->reason]);
     }
     
@@ -169,25 +175,39 @@ class WalletController extends Controller
         
         return response(['status' => 1,'data' => $data1]);
     }
-    public function withdrawRequestView($id){
+    
+
+    public function withdrawRequestView(Request $request){
+
+        $id = $request->input('withdraw_request_id');
+
         $data['data'] = WithdrawRequest::find($id);
+        
         $user = null;
+        
         if($data['data']->user_role == "vle"){
             $user = VleUser::find($data['data']->user_id);
         } else{
             $user = User::find($data['data']->user_id);
         }
+        
         $tds = 0;
+        
         if($data['data']->amount > 15000 && $data['data']->tds <= 0){
             $tds = ($data['data']->amount * 10) / 100;
             $data['data']->tds = $tds;
         }
+        
         $data['user']  = $user;
-        return view('user.wallet.request_view',$data);
+        
+        return response(['status' => 1,'data' => $data]);
     }
+
     public function approvalConfirm(Request $request){
-        $id = $request->get('id');
-        $result = WithdrawRequest::find($request->get('id'));
+        $id = $request->input('withdraw_request_id');
+        
+        $result = WithdrawRequest::find($request->input('withdraw_request_id'));
+        
         $tds = 0;
         if($result->amount > 15000){
             $tdsPercent = 10;
@@ -203,41 +223,46 @@ class WalletController extends Controller
         $data['tds'] = $tds;
         $data['withdrawAble'] = $result->amount - $tds;
         
-        $view = view('user.wallet.approve_ajax',$data)->render();
         $approve = true;
         if($currentAmount < ($result->amount - $tds)){
             $approve = false;
         }
-         return response(['status' => 1, 'data' => $view,'approve' => $approve]);
+         return response(['status' => 1, 'data' => $data,'approve' => $approve]);
     }
     
     public function topupRequest(Request $request){
-        if($request->get('start_date') && $request->get('end_date')){
+        $user_id = $request->input('user_id');
+        /*if($request->get('start_date') && $request->get('end_date')){
             \Session::put('export_start_date',$request->get('start_date'));
             \Session::put('export_end_date',$request->get('end_date'));
             return \Excel::download(new TopUpRequestImport(), 'topuprequest.xlsx');
-        }
+        }*/
+        
         $data['data'] = TopupRequest::select('topup_request.*','vle_users.name')
         ->join('vle_users','vle_users.id','=','topup_request.user_id')
-        ->where('vle_users.added_by',auth()->user()->id)
+        ->where('vle_users.added_by', $user_id)
         ->where('vle_users.added_by_role','partner')
         ->latest()
         ->get();
-        return view('user.wallet.topup_request',$data);
+
+        return response(['status' => 1, 'data' => $data] );
     }
     
-    public function topupRequestView($id){
+    public function topupRequestView(Request $request){
+        $id = $request->input('topup_request_id');
         $data['data'] = TopupRequest::findOrFail($id);
         $data['user'] = VleUser::find($data['data']->user_id);
-        return view('user.wallet.topup_request_view',$data);
+        return response(['status' => 1, 'data' => $data] );
     }
     
     public function topupRequestReject(Request $request){
-         $result = TopupRequest::find($request->get('id'));
-         $result->reason = $request->get('reason');
-         $result->status = 'rejected';
-         $result->save();
-         return redirect()->back()->withSuccess('Topup request rejected sucessfully');
+        $id     = $request->input('topup_request_id');
+        $reason = $request->input('reason');
+        $result = TopupRequest::find($id);
+        $result->reason = $reason;
+        $result->status = 'rejected';
+        $result->save();
+        return response(['status' => 1, 'data' => $result] );
     }
     
     public function approveTopupRequest(Request $request){
@@ -250,7 +275,7 @@ class WalletController extends Controller
             
             $auth_wallet = UserWallet::find(5);
             
-            TrHistory::create([
+        TrHistory::create([
             'wallet_id' =>  $result->wallet_id,
             'user_id' =>  $result->user_id,
             'from_wallet' => 5,
