@@ -80,7 +80,9 @@
                                         @elseif($value->patient_id)
                                         <?php 
                                             $vleUser = patientInfo($value->patient_id);
-                                            $username = "<br/><small class='text-black'><b>Patient:" . $vleUser->name . "</b></small>";
+                                            if($vleUser){
+                                                $username = "<br/><small class='text-black'><b>Patient:" . $vleUser->name . "</b></small>";
+                                            }
                                         ?>
                                         @endif
                                         {!! $username !!}
