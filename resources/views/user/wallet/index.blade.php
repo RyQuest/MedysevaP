@@ -65,6 +65,8 @@
                                         TDS
                                         @elseif($value->category == "withdraw")
                                         Withdraw
+                                        @elseif($value->category == "topup_recharge")
+                                        Topup Recharge
                                         @elseif($value->category == "register_fee")
                                         Registration Fee
                                         @elseif($value->category == "register_fee_out")

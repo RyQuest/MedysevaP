@@ -63,7 +63,10 @@
                                 <td>{{$data->reason}}</td>
                             </tr>
                             @endif
-                            @if($data->status == "pending")
+                            <?php 
+                                $loginUserWallet = loginUserWallet();
+                            ?>
+                            @if($data->status == "pending" && $loginUserWallet->id != $data->wallet_id)
                             <tr>
                                 <td colspan="2">
                                     <button data-value="{{$data->id}}" class='btn btn-primary approveRequest'>Approve</button>

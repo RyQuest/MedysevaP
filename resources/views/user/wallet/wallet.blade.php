@@ -28,8 +28,8 @@
                                     <th>From</th>
                                     <th>To</th>
                                     <td>Remark</td>
-                                    <td>Type</td>
                                     <th>Amount</th>
+                                    <td>Type</td>
                                     <th>Wallet Amount</th>
                                     <th>Date</th>
                                     <th>Action</th>
@@ -57,6 +57,8 @@
                                         TDS
                                         @elseif($value->category == "withdraw")
                                         Withdraw
+                                        @elseif($value->category == "topup_recharge")
+                                        Topup Recharge
                                         @elseif($value->category == "register_fee")
                                         Registration Fee
                                         @elseif($value->category == "register_fee_out")
