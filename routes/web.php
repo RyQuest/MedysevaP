@@ -111,6 +111,12 @@ Route::group(['middleware' => 'web'], function () {
             Route::get('transactions','WalletController@transactions')->name('walletTransactions');
             Route::get('transactions/view/{id}','WalletController@viewTrx')->name('viewTrx');
             
+            Route::get('my-topup','WalletController@MytopupRequest')->name('MytopupRequest');
+            Route::post('applyTopup','WalletController@applyTopup')->name('applyTopup');
+
+            Route::get('my-withdraw','WalletController@MywithdrawRequest')->name('MywithdrawRequest');
+            Route::post('apply-withdraw','WalletController@applyWithdraw')->name('applyWithdraw');
+
             Route::get('topup','WalletController@topupRequest')->name('topupRequest');
             Route::get('topup/{id}','WalletController@topupRequestView')->name('topupRequestView');
             Route::post('topupRequestReject','WalletController@topupRequestReject')->name('topupRequestReject');

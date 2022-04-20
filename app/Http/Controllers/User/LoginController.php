@@ -65,7 +65,7 @@ class LoginController extends Controller
             
             // \Log::info($params);
         $client = new \GuzzleHttp\Client();
-        $call = "https://eclinic.medyseva.com/api/forgot_password";
+        $call = "https://clinic.medyseva.com/api/forgot_password";
         $response = $client->request('POST', $call,[
             'multipart' => [
                 [

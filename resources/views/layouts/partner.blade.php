@@ -152,12 +152,6 @@
                             <span class="title">Wallet Details</span>
                         </a>
                     </li>
-                    <li class="">
-                        <a href="{{route('user.withdrawRequest')}}">
-                            <i class="fa fa-vcard-o" aria-hidden="true"></i>
-                            <span class="title">Withdraw Request</span>
-                        </a>
-                    </li>
                    
                     <!-- <li class="">
                         <a href="javascript:;">
@@ -200,9 +194,27 @@
                         </a>
                     </li>
                     <li class="">
+                        <a href="{{route('user.withdrawRequest')}}">
+                            <i class="fa fa-vcard-o" aria-hidden="true"></i>
+                            <span class="title">Withdraw Request</span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="{{route('user.MywithdrawRequest')}}">
+                            <i class="fa fa-vcard-o" aria-hidden="true"></i>
+                            <span class="title">My Withdraw</span>
+                        </a>
+                    </li>
+                    <li class="">
                         <a href="/wallet/topup">
                             <i class="fa fa-address-book"></i>
                             <span class="title">Topup Request</span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a href="{{route('user.MytopupRequest')}}">
+                            <i class="fa fa-address-book"></i>
+                            <span class="title">My Topup Request</span>
                         </a>
                     </li>
                     
