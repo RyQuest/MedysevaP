@@ -296,7 +296,7 @@ class WalletController extends Controller
     public function applyTopup(Request $request)
     {
         $client = new \GuzzleHttp\Client();
-        $call = "http://medyseva.lc/api/image_upload";
+        $call = apiUrl()."/api/image_upload";
         $response = $client->request('POST', $call,[
             'multipart' => [
                 [

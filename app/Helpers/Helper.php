@@ -76,4 +76,8 @@ function loginUserWallet(){
 function trxInfo($vle_id,$trx_id,$category){
     return \App\Models\TrHistory::where('trx_id',$trx_id)->where('category',$category)->where('vle_id',$vle_id)->first();
 }
+
+function apiUrl(){
+    return "https://clinic.medyseva.com/";
+}
 ?>
