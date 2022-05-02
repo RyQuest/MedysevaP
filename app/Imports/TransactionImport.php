@@ -19,8 +19,15 @@ class TransactionImport implements FromCollection, WithHeadings
         //
         $export_start_date = \Session::get('export_start_date');
         $export_end_date = \Session::get('export_end_date');
+        $export_vle_user_id = \Session::get('export_vle_user_id');
+
         if ($export_start_date && $export_end_date) {
-            $res =  TrHistory::select('*')->whereBetween('created_at', [$export_start_date, $export_end_date])->get();
+            
+            if($export_vle_user_id){
+                $res =  TrHistory::select('*')->whereBetween('created_at', [$export_start_date, $export_end_date])->where('vle_id', $export_vle_user_id)->get();
+            }else{
+                $res =  TrHistory::select('*')->whereBetween('created_at', [$export_start_date, $export_end_date])->get();
+            }
             $result = array();
             foreach ($res as $key => $value) {
                 $result1['from'] = "Medyseva";
@@ -48,7 +55,15 @@ class TransactionImport implements FromCollection, WithHeadings
                     $remark = "Registration Amount";
                 }
                 $result1['remark'] = $remark;
+                $loginUserWallet = loginUserWallet();
+                if($loginUserWallet->id == $value->from_wallet){
+                    $result1['type'] = "Debit";
+                } else{
+                    $result1['type'] = "Credit";
+                }
                 $result1['amount'] = $value->amount;
+                // $result1['wallet_amount'] = $value->current_amount;
+                $result1['wallet_amount'] = $loginUserWallet->id == $value->from_wallet ? $value->current_amount : $value->receiver_amount
                 $result1['date'] = date('Y-m-d H:i:s',strtotime($value->created_at));
 
                 $result[] = $result1;
@@ -58,6 +73,6 @@ class TransactionImport implements FromCollection, WithHeadings
     }
     public function headings(): array
     {
-        return ["From", 'To', 'Remark', 'Amount', 'Created At'];
+        return ["From", 'To', 'Remark', 'Type', 'Amount', 'Wallet Amount', 'Created At'];
     }
 }

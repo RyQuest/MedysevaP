@@ -1,6 +1,8 @@
 @extends('layouts.partner')
 @section('content')
 <div class="col-lg-12">
+
+    <!-- Export -->
     <section class="box inner-list-box">
         <div class="content-body">
             <form>
@@ -13,6 +15,29 @@
                     </div>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary">Export To Excel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+    <!-- Filter -->
+    <section class="box inner-list-box">
+        <div class="content-body">
+            <form method="get" action="transactions">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>VLE*</label>
+                        <select class="form-control" name="vle_user" id="">
+                            <option value="">--select--</option>
+                            @if(!empty( $vle_users ))
+                                @foreach( $vle_users as $vle_user )
+                                    <option value="{{ $vle_user->id }}">{{ $vle_user->name}}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">Filter</button>
                     </div>
                 </div>
             </form>

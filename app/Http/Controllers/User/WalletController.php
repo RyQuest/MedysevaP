@@ -46,13 +46,20 @@ class WalletController extends Controller
     public function transactions(Request $request)
     {
         if ($request->get('start_date') && $request->get('end_date')) {
+            \Session::put('export_vle_user_id', $request->get('vle_user'));
             \Session::put('export_start_date', $request->get('start_date'));
             \Session::put('export_end_date', $request->get('end_date'));
             return \Excel::download(new TransactionImport(), 'withdraw_request.xlsx');
         }
 
+        $data['vle_users'] = VleUser::where('added_by',auth()->user()->id)->where('added_by_role','partner')->latest()->get();
         $data['wallet'] = UserWallet::where('user_id', auth()->user()->id)->where('user_role', auth()->user()->role)->first();
-        $data['data'] = TrHistory::where('to_wallet', $data['wallet']->id)->orWhere('from_wallet', $data['wallet']->id)->orderBy('id', 'desc')->get();
+
+        if(isset($request->vle_user) || !empty($request->vle_user) ){
+            $data['data'] = TrHistory::where('to_wallet', $data['wallet']->id)->where('vle_id', $request->vle_user)->orWhere('from_wallet', $data['wallet']->id)->orderBy('id', 'desc')->get();
+        }else{
+            $data['data'] = TrHistory::where('to_wallet', $data['wallet']->id)->orWhere('from_wallet', $data['wallet']->id)->orderBy('id', 'desc')->get();
+        }
         return view('user.wallet.index', $data);
     }
     public function withdrawRequestApprove(Request $reqeust)

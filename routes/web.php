@@ -56,7 +56,7 @@ Route::get('home',function(){
 
 Route::get('testemai',function(){
     $vleCreate = App\Models\VleUser::find(23);
-    \Mail::to('pawanpatidar@questglt.com')->send(new App\Mail\VleRegister($vleCreate));
+    \Mail::to('ashishbanjare@questglt.com')->send(new App\Mail\VleRegister($vleCreate));
 });
 
 Route::group(['middleware' => 'web'], function () {
