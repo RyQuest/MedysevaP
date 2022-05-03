@@ -1,4 +1,7 @@
-<?php 
+<?php
+
+use App\Models\Chamber;
+
 $vle_comission = 19;
 $partner_comission = 9.50;
 
@@ -80,4 +83,24 @@ function trxInfo($vle_id,$trx_id,$category){
 function apiUrl(){
     return "https://clinic.medyseva.com/";
 }
+// function create_compact_serial_number($table, $chamber_uid)
+//     {
+
+//         $chamber_res = Chamber::where('uid',$chamber_uid)->first();
+
+//         if(!empty($chamber_res)){
+//             $total_xValue = count($ci->common_model->get_all($table)) + intval(1);
+
+//             if( $table == 'invoices'){
+//                 // Generate New Invoice Number in formate of HPD/2022/0001 
+//                 $compact_serial_number = strtoupper(substr($chamber_res[0]->name, 0, 3)).'/'. date('Y') .'/'. str_repeat('0', (4 - strlen($total_xValue) ) ).$total_xValue;
+//             }else{
+//                 $compact_serial_number = strtoupper(substr($chamber_res[0]->name, 0, 3)).'/'. str_repeat('0', (4 - strlen($total_xValue) ) ).$total_xValue;
+//             }
+
+//             return $compact_serial_number;
+//         }else{
+//             return null;
+//         }
+//     }
 ?>
