@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\VleController;
 use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\Vle\AppointmentController;
+use App\Http\Controllers\Api\Vle\AuthController;
+use App\Http\Controllers\Api\Vle\InvoiceController as VleInvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,13 +34,12 @@ Route::get('gethealthframefromscanidandCID/{scan_id}/{mobile}', [App\Http\Contro
 
 
 Route::prefix('company')->group(function () {
-    Route::get('getall',[App\Http\Controllers\Api\CompanyController::class, 'index']);
-    Route::post('create',[App\Http\Controllers\Api\CompanyController::class, 'create']);
-    Route::get('edit/{id}',[App\Http\Controllers\Api\CompanyController::class, 'edit']);
-    Route::post('update/{id}',[App\Http\Controllers\Api\CompanyController::class, 'update']);
-    Route::post('delete/{id}',[App\Http\Controllers\Api\CompanyController::class, 'deleteData']);
-    Route::get('getbyCIN/{id}',[App\Http\Controllers\Api\CompanyController::class, 'getbyCIN']);
-    
+    Route::get('getall', [App\Http\Controllers\Api\CompanyController::class, 'index']);
+    Route::post('create', [App\Http\Controllers\Api\CompanyController::class, 'create']);
+    Route::get('edit/{id}', [App\Http\Controllers\Api\CompanyController::class, 'edit']);
+    Route::post('update/{id}', [App\Http\Controllers\Api\CompanyController::class, 'update']);
+    Route::post('delete/{id}', [App\Http\Controllers\Api\CompanyController::class, 'deleteData']);
+    Route::get('getbyCIN/{id}', [App\Http\Controllers\Api\CompanyController::class, 'getbyCIN']);
 });
 
 Route::post('doctor/login', 'Api\Doctor\AuthController@login');
@@ -50,51 +52,88 @@ Route::post('doctor/register', 'Api\Doctor\AuthController@register');
 Route::post('contact', 'Api\Patient\AuthController@contact');
 
 Route::group(['middleware' => 'auth.jwt'], function () {
-    
+
     Route::post('doctor/logout', 'Api\Doctor\AuthController@logout');
-    
+
     Route::post('patient/logout', 'Api\Patient\AuthController@logout');
     Route::get('patient/profile/', 'Api\Patient\AuthController@getAuthUser');
     Route::post('patient/profile/update/{id}', 'Api\Patient\HomeController@profileUpdate');
     Route::post('patient/changepass/', 'Api\Patient\HomeController@changepass');
     Route::get('patient/appointments/', 'Api\Patient\HomeController@appointments');
-    
 });
 
 
 /* dev@ashish 2022-04-07 */
 
-Route::prefix('vle')->group(function(){
-    Route::post('getall',   [VleController::class, 'index']);
-    Route::post('chambers', [VleController::class, 'chambers']);
-    Route::post('create',   [VleController::class, 'create']);
-    Route::post('view',     [VleController::class, 'viewVle']);
-    Route::post('session',   [VleController::class, 'VleSession']);
-    Route::post('session/view',[VleController::class, 'viewVleSession']);
+Route::prefix('nict')->group(function () {
+    Route::prefix('vle')->group(function () {
+        Route::post('getall',   [VleController::class, 'index']);
+        Route::post('chambers', [VleController::class, 'chambers']);
+        Route::post('create',   [VleController::class, 'create']);
+        Route::post('view',     [VleController::class, 'viewVle']);
+        Route::post('session',   [VleController::class, 'VleSession']);
+        Route::post('session/view', [VleController::class, 'viewVleSession']);
+    });
+
+
+    Route::prefix('wallet')->group(function () {
+        Route::post('getall', [WalletController::class, 'index']);
+        Route::post('transactions', [WalletController::class, 'transactions']);
+        Route::post('transactions/view', [WalletController::class, 'viewTrx']);
+        Route::post('/request', [WalletController::class, 'withdrawRequest']);
+        Route::post('/request/view', [WalletController::class, 'withdrawRequestView']);
+        Route::post('request-approval-data', [WalletController::class, 'approvalConfirm']);
+        Route::post('/request/approve', [WalletController::class, 'withdrawRequestApprove']);
+        Route::post('request/reject', [WalletController::class, 'withdrawRequestReject']);
+        Route::post('request/reason', [WalletController::class, 'viewRejectReason']);
+        Route::post('topup', [WalletController::class, 'topupRequest']);
+        Route::post('topup/view', [WalletController::class, 'topupRequestView']);
+        Route::post('topupRequestReject', [WalletController::class, 'topupRequestReject']);
+        Route::post('approveTopupRequest', [WalletController::class, 'approveTopupRequest']);
+    });
+
+
+    Route::prefix('invoice')->group(function () {
+        Route::post('getall', [InvoiceController::class, 'index']);
+        Route::post('/view', [InvoiceController::class, 'view']);
+        Route::post('/nict', [InvoiceController::class, 'createNICTInvoice']);
+        Route::post('transactions', [InvoiceController::class, 'transactions']);
+        // Route::post('/request-amount','InvoiceController@saveNictInvoiceData');
+    });
 });
 
+// Vle apis
 
-Route::prefix('wallet')->group(function(){
-    Route::post('getall', [WalletController::class, 'index'] );
-    Route::post('transactions', [WalletController::class, 'transactions']);
-    Route::post('transactions/view',[WalletController::class, 'viewTrx']);
-    Route::post('/request',[WalletController::class, 'withdrawRequest']);
-    Route::post('/request/view',[WalletController::class, 'withdrawRequestView']);
-    Route::post('request-approval-data', [WalletController::class, 'approvalConfirm']);
-    Route::post('/request/approve', [WalletController::class, 'withdrawRequestApprove']);
-    Route::post('request/reject', [WalletController::class, 'withdrawRequestReject']);
-    Route::post('request/reason', [WalletController::class, 'viewRejectReason']);
-    Route::post('topup', [WalletController::class, 'topupRequest']);
-    Route::post('topup/view', [WalletController::class, 'topupRequestView'] );
-    Route::post('topupRequestReject', [WalletController::class, 'topupRequestReject']);
-    Route::post('approveTopupRequest', [WalletController::class, 'approveTopupRequest'] );
+Route::prefix('vle')->group(function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::prefix('appointment')->group(function () {
+        Route::post('/', [AppointmentController::class, 'index']);
+        Route::post('create', [AppointmentController::class, 'create']);
+    });
+
+    Route::prefix('invoice')->group(function () {
+        Route::post('/', [VleInvoiceController::class, 'vle_invoice']);
+        Route::post('/details/{id}', [VleInvoiceController::class, 'details']);
+    });
+
+    Route::prefix('wallet')->group(function () {
+        Route::post('/', [App\Http\Controllers\Api\Vle\WalletController::class, 'index']);
+    });
+
+    Route::prefix('withdraw_request')->group(function () {
+        Route::post('/', [App\Http\Controllers\Api\Vle\WalletController::class, 'withdrawRequest']);
+        Route::post('add', [App\Http\Controllers\Api\Vle\WalletController::class, 'withdrawRequestAdd']);
+    });
 });
 
-
-Route::prefix('invoice')->group(function(){
-    Route::post('getall', [InvoiceController::class, 'index']);
-    Route::post('/view',[InvoiceController::class, 'view']);
-    Route::post('/nict',[InvoiceController::class, 'createNICTInvoice']);
-    Route::post('transactions', [InvoiceController::class ,'transactions']);
-    // Route::post('/request-amount','InvoiceController@saveNictInvoiceData');
+// staff apis
+Route::prefix('staff')->group(function () {
+    Route::post('login', [App\Http\Controllers\Api\Staff\AuthController::class, 'login']);
+    Route::prefix('appointment')->group(function () {
+        Route::post('/create', [App\Http\Controllers\Api\Staff\AppointmentController::class, 'create']);
+        Route::post('/', [App\Http\Controllers\Api\Staff\AppointmentController::class, 'index']);
+    });
+    Route::prefix('patient')->group(function () {
+        Route::post('/create', [App\Http\Controllers\Api\Staff\PatientController::class, 'create']);
+    });
 });
