@@ -7,6 +7,10 @@ use App\Http\Controllers\Api\VleController;
 use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\Api\InvoiceController;
 
+/* Doctor */
+use App\Http\Controllers\Api\Doctor\UserController;
+use App\Http\Controllers\Api\Doctor\PrescriptionController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -59,6 +63,25 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::post('patient/changepass/', 'Api\Patient\HomeController@changepass');
     Route::get('patient/appointments/', 'Api\Patient\HomeController@appointments');
     
+});
+
+
+/* dev@ashish 2022-05-03 */
+Route::prefix('doctor')->group(function(){
+        Route::post('profile',   [UserController::class, 'profile']);
+        Route::post('profile/update',   [UserController::class, 'profileUpdate']);
+        /* Education */
+        Route::post('education/add',   [UserController::class, 'educationAdd']);
+        Route::post('education/update',   [UserController::class, 'educationUpdate']);
+        Route::post('education/delete',   [UserContrexperienceoller::class, 'educationDelete']);
+        /* Experience */
+        Route::post('experience/add',   [UserController::class, 'experienceAdd']);
+        Route::post('experience/update',   [UserController::class, 'experienceUpdate']);
+        Route::post('experience/delete',   [UserController::class, 'experienceDelete']);
+
+        /* all prescription */
+        Route::post('prescriptions', [PrescriptionController::class, 'index']);
+
 });
 
 

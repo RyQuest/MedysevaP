@@ -9,9 +9,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+use App\Models\Educations;
+use App\Models\Experiences;
+
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    protected $table = "users";
 
     /**
      * The attributes that are mass assignable.
@@ -66,5 +71,19 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    /**
+     * Get the educations for the user.
+     */
+    public function educations(){
+        return $this->hasMany(Educations::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the experiences for the user.
+     */
+    public function experiences(){
+        return $this->hasMany(Experiences::class, 'user_id', 'id');
     }
 }
