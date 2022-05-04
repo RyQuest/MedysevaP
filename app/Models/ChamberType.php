@@ -4,16 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\ChamberType;
+use App\Models\Chamber;
 
-class Chamber extends Model
+class ChamberType extends Model
 {
     use HasFactory;
     
     protected $table = "chamber";
     protected $guarded = ['id'];
 
-    public function type(){
-        return $this->belongsTo(ChamberType::class, 'type', 'id');
+    public function chambers(){
+        return $this->hasMany(Chamber::class, 'type', 'id');
     }
 }

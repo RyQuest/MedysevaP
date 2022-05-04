@@ -3,25 +3,50 @@
 namespace App\Http\Controllers\Api\Doctor;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
-use App\Models\User;
 use App\Models\Prescriptions;
+use App\Models\User;
 
 class PrescriptionController extends Controller
 {
-    /* get Doctor profile data */
+    /* get Prescriptions list data */
     public function index(Request $request){
+        $data = [];
         $user_id  = $request->input('user_id');
-        $offset   = $request->input('offset');
-        $limit    = $request->input('limit');
 
-        $prescriptions = Prescriptions::orderBy('id', 'DESC')
+        $prescriptions = Prescriptions::with(['chamber', 'patient'])
                         ->skip($offset)
                         ->take($limit)
+                        ->orderBy('id', 'DESC')
                         ->get();
+
+        $total_count = Prescriptions::count();
+
         if(!empty($prescriptions)){
-            return response(['status' => 1,'data' => $prescriptions]);
+            $data['prescriptions'] = $prescriptions;
+            $data['total_count'] = $total_count;
+            return response(['status' => 1,'data' => $data]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
+    
+
+    /* get Prescriptions view data */
+    public function view(Request $request){
+        $data = [];
+        $user_id  = $request->input('user_id');
+        $prescription_id  = $request->input('prescription_id');
+
+        $prescription = Prescriptions::with(['items', 'chamber', 'user', 'patient'])
+                        ->where('id', $prescription_id)
+                        ->first();
+
+        if(!empty($prescription)){
+            $data['prescription'] = $prescription;
+            return response(['status' => 1,'data' => $data]);
         }else{
             return response(['status' => 1,'data' => '']);
         }

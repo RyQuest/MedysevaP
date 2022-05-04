@@ -82,6 +82,7 @@ Route::prefix('doctor')->group(function(){
 
         /* all prescription */
         Route::post('prescriptions', [PrescriptionController::class, 'index']);
+        Route::post('prescription/view', [PrescriptionController::class, 'view']);
 
 });
 
