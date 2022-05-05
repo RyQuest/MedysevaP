@@ -83,7 +83,21 @@ Route::prefix('doctor')->group(function(){
         /* all prescription */
         Route::post('prescriptions', [PrescriptionController::class, 'index']);
         Route::post('prescription/view', [PrescriptionController::class, 'view']);
+        Route::post('prescription/create', [PrescriptionController::class, 'create']);
 
+        Route::post('diagonosis', [PrescriptionController::class, 'diagonosis']);
+        /* additional advises */
+        Route::post('additional_advises', [PrescriptionController::class, 'additionalAdvises']);
+        /* advises */
+        Route::post('advises', [PrescriptionController::class, 'advises']);
+        /* advise_investigations */
+        Route::post('advise_investigations', [PrescriptionController::class, 'adviseInvestigations']);
+        /* drugs */
+        Route::post('drugs', [PrescriptionController::class, 'drugs']);
+        /* Add new drug */
+        Route::post('drug/create', [PrescriptionController::class, 'addDrug']);
+        /* patientses */
+        Route::post('patientses', [PrescriptionController::class, 'patientses']);
 });
 
 
