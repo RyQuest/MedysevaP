@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Chamber;
 use App\Models\Patients;
-use App\Models\PrescriptionsItems;
+use App\Models\Prescriptions;
+use App\Models\Drugs;
 
-class Prescriptions extends Model
+class PrescriptionsItems extends Model
 {
-    protected $table = "prescription";
+    protected $table = "prescription_items";
 
     public $timestamps = false;
 
@@ -48,7 +49,7 @@ class Prescriptions extends Model
         return $this->belongsTo(Patients::class, 'patient_id', 'id');
     }
 
-    public function items(){
-        return $this->hasMany(PrescriptionsItems::class, 'prescription_id', 'id')->with('drugs');
+    public function drugs(){
+        return $this->belongsTo(Drugs::class, 'drug_id', 'id');
     }
 }
