@@ -46,6 +46,8 @@ Route::prefix('company')->group(function () {
     Route::get('getbyCIN/{id}', [App\Http\Controllers\Api\CompanyController::class, 'getbyCIN']);
 });
 
+Route::post('/importp',[App\Http\Controllers\Api\PatientController::class, 'importPatient']);
+
 Route::post('doctor/login', 'Api\Doctor\AuthController@login');
 Route::post('patient/login', 'Api\Patient\AuthController@login');
 Route::post('patient/forgot-password', 'Api\Patient\AuthController@forgot_password');
