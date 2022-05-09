@@ -157,6 +157,10 @@ Route::prefix('staff')->group(function () {
         Route::post('/', [App\Http\Controllers\Api\Staff\AppointmentController::class, 'index']);
     });
     Route::prefix('patient')->group(function () {
+        Route::post('/', [App\Http\Controllers\Api\Staff\PatientController::class, 'index']);
+        Route::post('/details/{id}', [App\Http\Controllers\Api\Staff\PatientController::class, 'details']);
         Route::post('/create', [App\Http\Controllers\Api\Staff\PatientController::class, 'create']);
+        Route::post('/delete', [App\Http\Controllers\Api\Staff\PatientController::class, 'deleteData']);
+        Route::post('/update', [App\Http\Controllers\Api\Staff\PatientController::class, 'updateData']);
     });
 });
