@@ -17,7 +17,10 @@ function partner_comission($amount){
 
 function walletAmount($wallet_id){
     $wallet = \App\Models\UserWallet::where('id',$wallet_id)->first();
-    return $wallet->amount;
+    if($wallet){
+        return $wallet->amount;
+    }
+    return "0";
 }
 
 function userAalletAmount($user_id,$user_role){
