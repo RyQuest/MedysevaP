@@ -19,4 +19,7 @@ class PatientController extends Controller
         $data['data'] = Patients::find($id);
         return view('user.patient.view',$data);    
     }
+    public function import(){
+        return view();
+    }
 }

@@ -19,11 +19,12 @@ class Prescriptions extends Model
      *
      * @var string[]
      */
-    protected $fillable = [
-        'chamber_id',
-        'patient_id',
-        'appointment_id'
-    ];
+    protected $guarded = ["id"];
+    // protected $fillable = [
+    //     'chamber_id',
+    //     'patient_id',
+    //     'appointment_id'
+    // ];
 
     /**
      * The attributes that should be hidden for serialization.

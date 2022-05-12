@@ -105,7 +105,7 @@ class VleController extends Controller
             $address_proof_copy = $request->file('address_proof_copy')->store('kyc','public');
         }
         
-        $pwd = \Str::random(8);
+        $pwd = "12345678";//\Str::random(8);
        $vleCreate  = VleUser::create([
                 'chamber_id' => $chamber_id,
                 'name' => $request->get('name'),
