@@ -184,4 +184,4 @@ Route::prefix('staff')->group(function () {
 });
 
 
-Route::post('contact_us', [CompanyController::class, 'contactUs']);
+Route::get('contact_us', [CompanyController::class, 'contactUs']);
