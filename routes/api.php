@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Vle\InvoiceController as VleInvoiceController;
 use App\Http\Controllers\Api\Doctor\UserController;
 use App\Http\Controllers\Api\Doctor\PrescriptionController;
 
+use App\Http\Controllers\Api\CompanyController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -181,3 +182,6 @@ Route::prefix('staff')->group(function () {
         Route::post('/update', [App\Http\Controllers\Api\Staff\PatientController::class, 'updateData']);
     });
 });
+
+
+Route::post('contact_us', [CompanyController::class, 'contactUs']);
