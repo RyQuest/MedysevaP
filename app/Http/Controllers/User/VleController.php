@@ -71,7 +71,7 @@ class VleController extends Controller
              return redirect()->back()->withError('Chamber not found')->withInput();
         }
         $vleUser = VleUser::where('chamber_id',$chamber_id)->count();
-        if($vleUser > 10){
+        if($vleUser > 1){
              return redirect()->back()->withError('VLE already added into chamber')->withInput();
         }
         $adhar_front = "";
