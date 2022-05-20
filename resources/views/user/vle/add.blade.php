@@ -39,7 +39,7 @@
                         </div>
                         <div class="form-group">
                             <label>Register Fee*</label>
-                            <input type="text" name="register_fee" class="form-control" value="{{old('register_fee')}}">
+                            <input type="text" name="register_fee" class="form-control" value="2124" disabled>
                             @if($errors->has('register_fee'))
                                 <div class="error text-danger">{{ $errors->first('register_fee') }}</div>
                             @endif
