@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Vle\InvoiceController as VleInvoiceController;
 
 /* Doctor */
 use App\Http\Controllers\Api\Doctor\UserController;
+use App\Http\Controllers\Api\Doctor\DashboardController;
 use App\Http\Controllers\Api\Doctor\PrescriptionController;
 
 use App\Http\Controllers\Api\CompanyController;
@@ -101,6 +102,8 @@ Route::prefix('doctor')->group(function(){
         Route::post('drug/create', [PrescriptionController::class, 'addDrug']);
         /* patientses */
         Route::post('patientses', [PrescriptionController::class, 'patientses']);
+
+        Route::post('dashboard',   [DashboardController::class, 'dashboard']);
 });
 
 
