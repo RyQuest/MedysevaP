@@ -15,6 +15,8 @@ class PrescriptionController extends Controller
     public function index(Request $request){
         $data = [];
         $user_id  = $request->input('user_id');
+        $offset  = $request->input('offset');
+        $limit  = $request->input('limit');
 
         $prescriptions = Prescriptions::with(['chamber', 'patient'])
                         ->skip($offset)
