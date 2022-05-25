@@ -278,6 +278,10 @@ class WalletController extends Controller
             $updateAdminWallet->amount = $amount;
             $updateAdminWallet->save();
 
+            $updateAdminWallet = UserWallet::find(5);
+            $updateAdminWallet->amount = $auth_wallet->amount - $result->amount;
+            $updateAdminWallet->save();
+
             $result->status = "approved";
             $result->current_amount = $user_wallet->amount + $result->amount;
             $result->approve_date = date('Y-m-d H:i:s');

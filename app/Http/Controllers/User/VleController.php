@@ -209,12 +209,12 @@ class VleController extends Controller
             
         // update admin wallet
         $updateAdminWallet = UserWallet::find(4);
-        $updateAdminWallet->amount += $adminAmt;
+        $updateAdminWallet->amount = $adminAmt;
         $updateAdminWallet->save();
 
         // update nict wallet
         $updateAdminWallet = UserWallet::find($authWallet->id);
-        $updateAdminWallet->amount += $loginUserAmt;
+        $updateAdminWallet->amount = $loginUserAmt;
         $updateAdminWallet->save();
         
         
