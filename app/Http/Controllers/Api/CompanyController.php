@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\Contact;
+use App\Models\JoinUs;
 class CompanyController extends Controller
 {
     //
@@ -78,6 +79,47 @@ class CompanyController extends Controller
         return response(['status' => 0,'msg' => 'Company not found.']);
     }
 
+    public function joinUs(Request $request)
+    {
+        /*$validator = \Validator::make($request->all(), 
+            [ 
+                'doctor_name' => 'required',
+                'doctor_specialization' => 'required',
+                'doctor_number' => 'required', 
+                'doctor_email' => 'required|email',
+
+                'center_name' => 'required',
+                'center_phone_num' => 'required', 
+                'center_address' => 'required',
+                'center_email' => 'required|email',
+            ]);
+ 
+         if ($validator->fails()) {  
+               return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+            }  */ 
+        $joinus = new JoinUs();
+        
+        if($request->contactus_type == 'doctor'){
+            $joinus->doctor_name       = $request->doctor_name;
+            $joinus->doctor_specialization = $request->doctor_specialization;
+            $joinus->doctor_number     = $request->doctor_number;
+            $joinus->doctor_email      = $request->doctor_email;
+        }else{
+            $joinus->center_name       = $request->center_name;
+            $joinus->center_phone_num  = $request->center_phone_num;
+            $joinus->center_address    = $request->center_address;
+            $joinus->center_email      = $request->center_email;
+        }
+        $joinus->contactus_type  = $request->contactus_type;
+
+        $joinus->save();
+
+        return response()->json([
+            'status' => 1,
+            'msg' => "submitted successfully",
+        ]);
+    }
+
     public function contactUs(Request $request)
     {
         /*$validator = \Validator::make($request->all(), 
@@ -97,20 +139,10 @@ class CompanyController extends Controller
                return response(['status' => 0, 'msg' => $validator->errors()->first()]);
             }  */ 
         $contact = new Contact();
-        
-        if($request->contactus_type == 'doctor'){
-            $contact->doctor_name       = $request->doctor_name;
-            $contact->doctor_specialization = $request->doctor_specialization;
-            $contact->doctor_number     = $request->doctor_number;
-            $contact->doctor_email      = $request->doctor_email;
-        }else{
-            $contact->center_name       = $request->center_name;
-            $contact->center_phone_num  = $request->center_phone_num;
-            $contact->center_address    = $request->center_address;
-            $contact->center_email      = $request->center_email;
-        }
-        $contact->contactus_type  = $request->contactus_type;
-
+        $contact->name      = $request->name;
+        $contact->mobile    = $request->mobile;
+        $contact->email     = $request->email;
+        $contact->type      = $request->type;
         $contact->save();
 
         return response()->json([

@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Contact extends Model
+class JoinUs extends Model
 {
     use HasFactory;
     
-    protected $table = "contact_us";
+    protected $table = "join_us";
     protected $guarded = ["id"];
 }
