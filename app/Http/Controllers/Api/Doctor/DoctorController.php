@@ -92,6 +92,21 @@ class DoctorController extends Controller
             $query2->where('p.patient_id', $value->patient_id);
             $query2->where(DB::raw("(DATE_FORMAT(p.created_at,'%Y-%m-%d'))"), $value->date);
             $appointments[$key]->is_done = $query2->count();
+
+            $query3 = DB::table('payment_user');
+            $query3->where('user_id', $value->user_id);
+            $query3->where('appointment_id', $value->id);
+            $payment = $query3->first();
+            if (empty($payment)) {
+                $appointments[$key]->payment_status = 0;
+            } else {
+                if ($payment->status == 'verified') {
+                    $appointments[$key]->payment_status = 1;
+                } else {
+                    $appointments[$key]->payment_status = 0;
+                }
+            }
+
         }
 
 
