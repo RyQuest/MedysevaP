@@ -11,6 +11,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 use App\Models\Educations;
 use App\Models\Experiences;
+use App\Models\Chamber;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -86,4 +87,5 @@ class User extends Authenticatable implements JWTSubject
     public function experiences(){
         return $this->hasMany(Experiences::class, 'user_id', 'id');
     }
+
 }
