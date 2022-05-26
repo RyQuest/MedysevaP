@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Vle\InvoiceController as VleInvoiceController;
 
 /* Doctor */
 use App\Http\Controllers\Api\Doctor\UserController;
+use App\Http\Controllers\Api\Doctor\DoctorController;
 use App\Http\Controllers\Api\Doctor\DashboardController;
 use App\Http\Controllers\Api\Doctor\PrescriptionController;
 
@@ -104,6 +105,10 @@ Route::prefix('doctor')->group(function(){
         Route::post('patientses', [PrescriptionController::class, 'patientses']);
 
         Route::post('dashboard',   [DashboardController::class, 'dashboard']);
+        
+        Route::post('appointments',   [DoctorController::class, 'appointments']);
+        
+        Route::post('appointment/list/by_date',   [DoctorController::class, 'appointmentListByDate']);
 });
 
 
