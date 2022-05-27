@@ -152,7 +152,7 @@
 @section('script')
 <script>
     $("#trx-table").dataTable({
-        lengthChange:false,
+        lengthChange:true,
         "order": [[ 7, "desc" ]]
     });
 </script>
