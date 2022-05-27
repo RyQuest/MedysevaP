@@ -267,7 +267,7 @@ class WalletController extends Controller
                 'user_role' => 'vle',
                 'amount' => $result->amount,
                 'category' => 'topup_recharge',
-                'current_amount' => $auth_wallet->amount - $result->amount,
+                'current_amount' => $auth_wallet->amount,
                 'receiver_amount' => $user_wallet->amount + $result->amount
             ]);
 
@@ -278,9 +278,9 @@ class WalletController extends Controller
             $updateAdminWallet->amount = $amount;
             $updateAdminWallet->save();
 
-            $updateAdminWallet = UserWallet::find(5);
-            $updateAdminWallet->amount = $auth_wallet->amount - $result->amount;
-            $updateAdminWallet->save();
+            // $updateAdminWallet = UserWallet::find(5);
+            // $updateAdminWallet->amount = $auth_wallet->amount - $result->amount;
+            // $updateAdminWallet->save();
 
             $result->status = "approved";
             $result->current_amount = $user_wallet->amount + $result->amount;
