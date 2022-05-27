@@ -32,9 +32,9 @@
                     <table class="table vm table-small-font no-mb table-bordered table-striped" id="trx-table">
                         <thead>
                             <th>VLE Name</th>
-                            <th>Amount</th>
-                            <th>GST</th>
-                            <th>Total</th>
+                            <th>Total Amount</th>
+                            <th>TDS</th>
+                            <th>Received Amount</th>
                             <th>Status</th>
                             <th>Approve Date</th>
                             <th>Date</th>
@@ -47,13 +47,13 @@
                               </td>
                               
                               <td>
-                                  <span>{{$value->amount}}</span>
+                                  <span>{{$value->total}}</span>
                               </td>
                               <td>
-                                  {{$value->gst}}
+                                  {{$value->status == "pending" ? "0":$value->gst}}
                               </td>
                               <td>
-                                  {{$value->total}}
+                                  {{$value->status == "pending" ? "0" : $value->amount}}
                               </td>
                               <td>
                                   {{ucfirst($value->status)}}

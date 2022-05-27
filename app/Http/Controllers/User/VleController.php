@@ -72,7 +72,7 @@ class VleController extends Controller
         }
         $vleUser = VleUser::where('chamber_id',$chamber_id)->count();
         if($vleUser > 1){
-             return redirect()->back()->withError('VLE already added into chamber')->withInput();
+            //  return redirect()->back()->withError('VLE already added into chamber')->withInput();
         }
         $adhar_front = "";
         $adhar_back = "";
@@ -121,6 +121,7 @@ class VleController extends Controller
                 'marksheet' => $marksheet,
                 'address_proof_copy' => $address_proof_copy,
                 'address_proof' => $request->get('address_proof'),
+                'status' => '0',
            ]); 
         
         // create wallet
@@ -166,51 +167,51 @@ class VleController extends Controller
          
         
         $loginUserAmt = $authWallet->amount + $register_fee;
-        $adminWallet = UserWallet::where('id',4)->first();
+        // $adminWallet = UserWallet::where('id',4)->first();
         
-        // $gst = ($register_fee * 18) / 100;
-        $tds = 30;
+        // // $gst = ($register_fee * 18) / 100;
+        // $tds = 30;
         
-        // $r_amount = $register_fee - $tds;
-        $r_amount = 1770;
-        $adminAmt = $adminWallet->amount + $r_amount;
-        $loginUserAmt = $loginUserAmt - $r_amount;
+        // // $r_amount = $register_fee - $tds;
+        // $r_amount = 1770;
+        // $adminAmt = $adminWallet->amount + $r_amount;
+        // $loginUserAmt = $loginUserAmt - $r_amount;
         
-        TrHistory::create([
-            'wallet_id' => 4,
-            'trx_id' => $trx_id,
-            'user_id' => 1,
-            'from_wallet' => $authWallet->id,
-            'to_wallet' => 4,
-            'user_role' => 'admin',
-            'amount' => $r_amount,
-            'category' => 'register_fee',
-            'current_amount' => $loginUserAmt,
-            'receiver_amount' => $adminAmt, 
-            'vle_id' => $vleCreate->id,
-         ]);
+        // TrHistory::create([
+        //     'wallet_id' => 4,
+        //     'trx_id' => $trx_id,
+        //     'user_id' => 1,
+        //     'from_wallet' => $authWallet->id,
+        //     'to_wallet' => 4,
+        //     'user_role' => 'admin',
+        //     'amount' => $r_amount,
+        //     'category' => 'register_fee',
+        //     'current_amount' => $loginUserAmt,
+        //     'receiver_amount' => $adminAmt, 
+        //     'vle_id' => $vleCreate->id,
+        //  ]);
          
-        $adminAmt = $adminAmt + $tds;
-        $loginUserAmt = $loginUserAmt - $tds;
+        // $adminAmt = $adminAmt + $tds;
+        // $loginUserAmt = $loginUserAmt - $tds;
         
-        TrHistory::create([
-            'wallet_id' => 4,
-            'trx_id' => $trx_id,
-            'user_id' => 1,
-            'from_wallet' => $authWallet->id,
-            'to_wallet' => 4,
-            'user_role' => 'admin',
-            'amount' => $tds,
-            'category' => 'tds',
-            'current_amount' => $loginUserAmt,
-            'receiver_amount' => $adminAmt, 
-            'vle_id' => $vleCreate->id,
-         ]);
+        // TrHistory::create([
+        //     'wallet_id' => 4,
+        //     'trx_id' => $trx_id,
+        //     'user_id' => 1,
+        //     'from_wallet' => $authWallet->id,
+        //     'to_wallet' => 4,
+        //     'user_role' => 'admin',
+        //     'amount' => $tds,
+        //     'category' => 'tds',
+        //     'current_amount' => $loginUserAmt,
+        //     'receiver_amount' => $adminAmt, 
+        //     'vle_id' => $vleCreate->id,
+        //  ]);
             
-        // update admin wallet
-        $updateAdminWallet = UserWallet::find(4);
-        $updateAdminWallet->amount = $adminAmt;
-        $updateAdminWallet->save();
+        // // update admin wallet
+        // $updateAdminWallet = UserWallet::find(4);
+        // $updateAdminWallet->amount = $adminAmt;
+        // $updateAdminWallet->save();
 
         // update nict wallet
         $updateAdminWallet = UserWallet::find($authWallet->id);
@@ -221,14 +222,14 @@ class VleController extends Controller
         // send email
         $vleCreate->password = $pwd;
         // \Mail::to($vleCreate->email)->send(new VleRegister($vleCreate));
-        /*PartnerInvoice::create([
+        PartnerInvoice::create([
             'user_id' => auth()->user()->id,
             'vle_id' => $vleCreate->id,
-            'amount' => 300,
-            'gst' => 54,
-            'total' => 354,
+            'amount' => 324,
+            'gst' => 30,
+            'total' => $register_fee,
             'status' => 'pending'
-        ]);*/
+        ]);
         \DB::commit();
         return redirect()->to('/vle')->withSuccess('Vle added successfully');
     }
