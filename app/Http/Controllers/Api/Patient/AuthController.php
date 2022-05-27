@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Patients;
+use App\Models\Contact;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use JWTAuth;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,7 +41,8 @@ class AuthController extends Controller
                      ]);  
  
          if ($validator->fails()) {  
-               return response()->json(['error'=>$validator->errors()], 401); 
+            //   return response()->json(['error'=>$validator->errors()], 401); 
+               return response(['status' => 0, 'msg' => $validator->errors()->first()]);
             }   
         $user = new Patients();
         $user->name = $request->name;
@@ -62,7 +64,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 1,
-            'messag' => "User Registered successfully",
+            'msg' => "User Registered successfully",
         ]);
         // if ($this->token) {
         //     return $this->login($request);
@@ -83,7 +85,8 @@ class AuthController extends Controller
                      ]);  
  
          if ($validator->fails()) {  
-              return response()->json(['error'=>$validator->errors()], 401); 
+            //   return response()->json(['error'=>$validator->errors()], 401); 
+            return response(['status' => 0, 'msg' => $validator->errors()->first()]);
             } 
         $input = $request->only('email', 'password');
         $jwt_token = null;
@@ -97,7 +100,7 @@ class AuthController extends Controller
         $user = Patients::where('email',$request->email)->first();
         
         return response()->json([
-            'success' => true,
+            'status' => 1,
             'token' => $jwt_token,
             'user' => $user,
         ]);
@@ -114,13 +117,13 @@ class AuthController extends Controller
             JWTAuth::invalidate($request->token);
  
             return response()->json([
-                'success' => true,
-                'message' => 'User logged out successfully'
+                'status' => 1,
+                'msg' => 'User logged out successfully'
             ]);
         } catch (JWTException $exception) {
             return response()->json([
-                'success' => false,
-                'message' => 'Sorry, the user cannot be logged out'
+                'status' => 0,
+                'msg' => 'Sorry, the user cannot be logged out'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -128,17 +131,35 @@ class AuthController extends Controller
     public function getAuthUser(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate($request->token);
-        return response()->json(['success' => true,'user' => $user]);
+        return response()->json(['status' => 1,'user' => $user]);
     }
     
     public function forgot_password(Request $request)
     {
+          $validator = \Validator::make($request->all(),[
+            'email' => 'required',
+        ]);
+        
+        if($validator->fails()){
+             return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+        }
+        
         $credentials = request()->validate(['email' => 'required|email']);
         Password::sendResetLink($credentials);
-        return response()->json(["msg" => 'Reset password link sent on your email id.']);
+        return response()->json(['status' => 1,"msg" => 'Reset password link sent on your email id.']);
     }
     
-    public function reset() {
+    public function reset(Request $request) {
+          $validator = \Validator::make($request->all(),[
+           'email' => 'required|email',
+            'token' => 'required|string',
+            'password' => 'required'
+        ]);
+        
+        if($validator->fails()){
+             return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+        }
+        
         $credentials = request()->validate([
             'email' => 'required|email',
             'token' => 'required|string',
@@ -151,10 +172,43 @@ class AuthController extends Controller
         });
 
         if ($reset_password_status == Password::INVALID_TOKEN) {
-            return response()->json(["msg" => "Invalid token provided"], 400);
+            return response()->json(['status' => 0,"msg" => "Invalid token provided"], 400);
         }
 
-        return response()->json(["msg" => "Password has been successfully changed"]);
+        return response()->json(['status' => 1,"msg" => "Password has been successfully changed"]);
     }
     
+    public function contact(Request $request)
+    {
+        // $user = JWTAuth::parseToken()->authenticate($request->token);
+        // $id = 0;
+        // if($user){
+        //     $id = $user->id;
+        // }
+         $validator = \Validator::make($request->all(), 
+                      [ 
+                      'name' => 'required',
+                      'email' => 'required|email',
+                      'mobile' => 'required', 
+                      'message' => 'required',
+                     ]);  
+ 
+         if ($validator->fails()) {  
+            //   return response()->json(['error'=>$validator->errors()], 401); 
+               return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+            }   
+        $user = new Contact();
+        // $user->user_id = $id;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->mobile = $request->mobile;
+        $user->message = $request->message;
+        $user->save();
+
+        return response()->json([
+            'status' => 1,
+            'msg' => "submitted successfully",
+        ]);
+    }
+
 }

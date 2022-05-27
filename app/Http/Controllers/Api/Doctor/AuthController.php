@@ -8,7 +8,9 @@ use App\Models\User;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use JWTAuth;
 use Symfony\Component\HttpFoundation\Response;
- 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+
 class AuthController extends Controller
 {
     //
@@ -21,66 +23,61 @@ class AuthController extends Controller
          $this->guard = "api";
     }
     
-    // public function register(Request $request)
-    // {
+    public function register(Request $request)
+    {
  
-    //      $validator = \Validator::make($request->all(), 
-    //                   [ 
-    //                   'firstName' => 'required',
-    //                   'lastName' => 'required',
-    //                   'gender' => 'required',
-    //                   'NFC' => 'required',
-    //                   'company' => 'required',
-    //                   'bloodGroup' => 'required',
-    //                   'dob' => 'required',
-    //                   'mobile' => 'required|unique:users,mobile',
-    //                   'bpMed' => 'required',
-    //                   'subscription' => 'required',
-    //                   'email' => 'required|unique:users,email',
-    //                   'password' => 'required',   
-    //                  ]);  
+         $validator = \Validator::make($request->all(), 
+                      [ 
+                      'name' => 'required',
+                      'email' => 'required|unique:users,email',
+                      'password' => 'required',   
+                     ]);  
  
-    //      if ($validator->fails()) {  
-    //           return response()->json(['error'=>$validator->errors()], 401); 
-    //         }   
-    //     $user = new User();
-    //     $user->firstName = $request->firstName;
-    //     $user->lastName = $request->lastName;
-    //     $user->gender = $request->gender;
-    //     $user->NFC = $request->NFC;
-    //     $user->company = $request->company;
-    //     $user->bloodGroup = $request->bloodGroup;
-    //     $user->dob = $request->dob;
-    //     $user->mobile = $request->mobile;
-    //     $user->bpMed = $request->bpMed ?? 0;
-    //     $user->subscription = $request->subscription ?? 0;
-    //     $user->email = $request->email;
-    //     $user->password = bcrypt($request->password);
-        
-    //     $user->middleName = $request->middleName;
-    //     $user->weight = $request->weight;
-    //     $user->height = $request->height;
-    //     $user->medHistory = $request->medHistory;
-    //     $user->guest = $request->guest ?? 0;
-    //     $user->student = $request->student ?? 0;
-    //     $user->patient = $request->patient ?? 0;
-    //     $user->check = $request->check ?? 0;
-    //     $user->lastScanId = $request->lastScanId;
-    //     $user->ttl = $request->ttl;
-    //     $user->preScanCompleted = $request->preScanCompleted ?? 1;
-    //     $user->preScanId = $request->preScanId;
-    //     $user->postScanId = $request->postScanId;
-    //     $user->save();
+         if ($validator->fails()) {  
+            //   return response()->json(['error'=>$validator->errors()], 401); 
+            return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+            }   
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->parent_id = 3;
+        // $user->middleName = $request->middleName;
+        // $user->weight = $request->weight;
+        // $user->height = $request->height;
+        // $user->medHistory = $request->medHistory;
+        // $user->guest = $request->guest ?? 0;
+        // $user->student = $request->student ?? 0;
+        // $user->patient = $request->patient ?? 0;
+        // $user->check = $request->check ?? 0;
+        // $user->lastScanId = $request->lastScanId;
+        // $user->ttl = $request->ttl;
+        // $user->preScanCompleted = $request->preScanCompleted ?? 1;
+        // $user->preScanId = $request->preScanId;
+        // $user->postScanId = $request->postScanId;
+        $user->save();
+         $email = $request->email;
+        $data = array('name'=>$request->name);
+                Mail::send('regmail', $data, function($message) use ($email) {
+                $message->to($email, 'Medyseva')->subject
+                    ('Doctor Registration mail');
+                // $message->from('medyseva@gmail.com','Medyseva');
+                });
+
+        return response()->json([
+            'status' => 1,
+            'msg' => "Registered successfully",
+        ]);
   
-    //     if ($this->token) {
-    //         return $this->login($request);
-    //     }
+        // if ($this->token) {
+        //     return $this->login($request);
+        // }
   
-    //     return response()->json([
-    //         'success' => true,
-    //         'data' => $user
-    //     ], Response::HTTP_OK);
-    // }
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => $user
+        // ], Response::HTTP_OK);
+    }
 
     public function login(Request $request)
     {
@@ -91,22 +88,23 @@ class AuthController extends Controller
                      ]);  
  
          if ($validator->fails()) {  
-              return response()->json(['error'=>$validator->errors()], 401); 
+            //   return response()->json(['error'=>$validator->errors()], 401); 
+            return response(['status' => 0, 'msg' => $validator->errors()->first()]);
             } 
         $input = $request->only('email', 'password');
         $jwt_token = null;
  
         if (!$jwt_token = JWTAuth::attempt($input)) {
             return response()->json([
-                'status' => false,
-                'message' => 'Invalid Email or Password',
+                'status' => 0,
+                'msg' => 'Invalid Email or Password',
             ], Response::HTTP_UNAUTHORIZED);
         }
         
         $user = User::where('email',$request->email)->first();
         
         return response()->json([
-            'status' => true,
+            'status' => 1,
             'token' => $jwt_token,
             'user' => $user,
         ]);
@@ -123,13 +121,13 @@ class AuthController extends Controller
             JWTAuth::invalidate($request->token);
  
             return response()->json([
-                'status' => true,
-                'message' => 'User logged out successfully'
+                'status' => 1,
+                'msg' => 'User logged out successfully'
             ]);
         } catch (JWTException $exception) {
             return response()->json([
-                'status' => false,
-                'message' => 'Sorry, the user cannot be logged out'
+                'status' => 0,
+                'msg' => 'Sorry, the user cannot be logged out'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

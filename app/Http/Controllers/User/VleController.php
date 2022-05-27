@@ -42,7 +42,7 @@ class VleController extends Controller
                 'chamber' => 'required',
                 'name' => 'required',
                 'email' => 'required|email|unique:vle_users',
-                'register_fee' => 'required',
+                // 'register_fee' => 'required',
                 //'confirm_register_fee' => 'required',
                 'adhar_front' => 'required|mimes:jpeg,jpg,png,gif,pdf|max:2048',
                 'adhar_back' => 'required|mimes:jpeg,jpg,png,gif,pdf|max:2048',
@@ -105,7 +105,7 @@ class VleController extends Controller
             $address_proof_copy = $request->file('address_proof_copy')->store('kyc','public');
         }
         
-        $pwd = \Str::random(8);
+        $pwd = "12345678";//\Str::random(8);
        $vleCreate  = VleUser::create([
                 'chamber_id' => $chamber_id,
                 'name' => $request->get('name'),
@@ -133,10 +133,13 @@ class VleController extends Controller
         
         // update admin wallet
         $authWallet = UserWallet::where('user_id',auth()->user()->id)->where('user_role',auth()->user()->role)->first();
-        $register_fee = $request->get('register_fee');
+        // $register_fee = $request->get('register_fee');
+        $register_fee = '2124';
+        $trx_id = uniqid();
         
         // add amount to partner wallet
         TrHistory::create([
+            'trx_id' => $trx_id,
             'wallet_id' => $authWallet->id,
             'user_id' => auth()->user()->id,
             'from_wallet' => $authWallet->id,
@@ -165,13 +168,14 @@ class VleController extends Controller
         $loginUserAmt = $authWallet->amount + $register_fee;
         $adminWallet = UserWallet::where('id',4)->first();
         
-        $gst = ($register_fee * 18) / 100;
+        // $gst = ($register_fee * 18) / 100;
+        $tds = 30;
         
-        $r_amount = $register_fee - $gst;
+        // $r_amount = $register_fee - $tds;
+        $r_amount = 1770;
         $adminAmt = $adminWallet->amount + $r_amount;
         $loginUserAmt = $loginUserAmt - $r_amount;
         
-        $trx_id = uniqid();
         TrHistory::create([
             'wallet_id' => 4,
             'trx_id' => $trx_id,
@@ -186,8 +190,8 @@ class VleController extends Controller
             'vle_id' => $vleCreate->id,
          ]);
          
-        $adminAmt = $adminAmt + $gst;
-        $loginUserAmt = $loginUserAmt - $gst;
+        $adminAmt = $adminAmt + $tds;
+        $loginUserAmt = $loginUserAmt - $tds;
         
         TrHistory::create([
             'wallet_id' => 4,
@@ -196,8 +200,8 @@ class VleController extends Controller
             'from_wallet' => $authWallet->id,
             'to_wallet' => 4,
             'user_role' => 'admin',
-            'amount' => $gst,
-            'category' => 'gst',
+            'amount' => $tds,
+            'category' => 'tds',
             'current_amount' => $loginUserAmt,
             'receiver_amount' => $adminAmt, 
             'vle_id' => $vleCreate->id,
@@ -205,20 +209,26 @@ class VleController extends Controller
             
         // update admin wallet
         $updateAdminWallet = UserWallet::find(4);
-        $updateAdminWallet->amount += $register_fee;
+        $updateAdminWallet->amount = $adminAmt;
         $updateAdminWallet->save();
+
+        // update nict wallet
+        $updateAdminWallet = UserWallet::find($authWallet->id);
+        $updateAdminWallet->amount = $loginUserAmt;
+        $updateAdminWallet->save();
+        
         
         // send email
         $vleCreate->password = $pwd;
         // \Mail::to($vleCreate->email)->send(new VleRegister($vleCreate));
-        PartnerInvoice::create([
+        /*PartnerInvoice::create([
             'user_id' => auth()->user()->id,
             'vle_id' => $vleCreate->id,
             'amount' => 300,
             'gst' => 54,
             'total' => 354,
             'status' => 'pending'
-        ]);
+        ]);*/
         \DB::commit();
         return redirect()->to('/vle')->withSuccess('Vle added successfully');
     }

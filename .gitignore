@@ -13,4 +13,13 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+<<<<<<< HEAD
 /clinic
+=======
+*.zip
+
+/application/config/database.php
+server.php
+/uploads
+.htaccess
+>>>>>>> c0ac60df3ae46a0088dde93c0e8957d5be977b6f
