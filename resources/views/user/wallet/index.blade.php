@@ -72,7 +72,7 @@
                                 @foreach($data as $key => $value)
                                  <tr>
                                     
-                                    <td>#{{$value->id}}</td>
+                                    <td>{{$value->id}}</td>
                                     <td>{{getUsername($value->from_wallet)}}</td>
                                     <td>{{getUsername($value->to_wallet)}}</td>
                                     <td>
@@ -153,7 +153,7 @@
 <script>
     $("#trx-table").dataTable({
         lengthChange:true,
-        "order": [[ 7, "desc" ]]
+        "order": [[ 0, "desc" ]]
     });
 </script>
 @stop
