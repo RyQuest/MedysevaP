@@ -39,7 +39,7 @@ class DashboardController extends Controller
         $dr_query->skip($offset);
         $dr_query->take($limit);
 
-        $data['appointments'] = $dr_query->get();;
+        $data['appointments'] = $dr_query->get();
 
         if(!empty($data)){
             return response(['status' => 1,'data' => $data]);
