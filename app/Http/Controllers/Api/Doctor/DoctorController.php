@@ -63,7 +63,7 @@ class DoctorController extends Controller
         $user = User::find($user_id);
 
         $dr_query = DB::table('appointments');
-        $dr_query->leftJoin('patientses', 'patientses.id', '=', 'appointments.patient_id');
+        // $dr_query->leftJoin('patientses', 'patientses.id', '=', 'appointments.patient_id');
 
         if($user->chamber_id > 0)        {
             $dr_query->where('chamber_id',$chamber_uid);
@@ -88,11 +88,15 @@ class DoctorController extends Controller
         $appointments = $dr_query->get();
 
         foreach ($appointments as $key => $value) {
+
+            $appointments[$key]->patient = DB::table('patientses')->where('id', $value->patient_id)->first();
+
             $query2 = DB::table('prescription as p');
             $query2->where('p.patient_id', $value->patient_id);
             $query2->where(DB::raw("(DATE_FORMAT(p.created_at,'%Y-%m-%d'))"), $value->date);
             $appointments[$key]->is_done = $query2->count();
 
+            // User Payment status
             $query3 = DB::table('payment_user');
             $query3->where('user_id', $value->user_id);
             $query3->where('appointment_id', $value->id);
@@ -112,6 +116,40 @@ class DoctorController extends Controller
 
         if(!empty($appointments)){
             return response(['status' => 1,'data' => $appointments]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
+
+    /* get all appoinment schedule of doctor*/
+    public function schedule(Request $request){
+        $user_id = $request->input('user_id');
+        $assign_time = DB::table('assign_time')->where('user_id', $user_id)->orderBy('day_id', 'ASC')->get();
+        if(!empty($assign_time)){
+            return response(['status' => 1,'data' => $assign_time]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
+
+    /* get all appoinment schedule of doctor*/
+    public function addSchedule(Request $request){
+        $user_id    = $request->input('user_id');
+        $day_id     = $request->input('day_id');
+        $start      = $request->input('start');
+        $end        = $request->input('end');
+        
+        $time_data = array(
+            'user_id' => $user_id,
+            'day_id' => $day_id,
+            'time' => $start . '-' . $end,
+            'start' => $start,
+            'end' => $end
+        );
+        $res = DB::table('assign_time')->insert($time_data);
+
+        if(!empty($res)){
+            return response(['status' => 1,'data' => $res]);
         }else{
             return response(['status' => 1,'data' => '']);
         }
