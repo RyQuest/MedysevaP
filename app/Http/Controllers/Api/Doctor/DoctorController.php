@@ -21,7 +21,7 @@ class DoctorController extends Controller
         $user = User::find($user_id);
 
 
-        $dr_query = DB::table('appointments');
+        $dr_query = DB::table('appointments')->select('id', 'date');
 
         if($user->chamber_id > 0)        {
             $dr_query->where('chamber_id',$chamber_uid);
@@ -124,9 +124,15 @@ class DoctorController extends Controller
     /* get all appoinment schedule of doctor*/
     public function schedule(Request $request){
         $user_id = $request->input('user_id');
-        $assign_time = DB::table('assign_time')->where('user_id', $user_id)->orderBy('day_id', 'ASC')->get();
-        if(!empty($assign_time)){
-            return response(['status' => 1,'data' => $assign_time]);
+        $assign_days = DB::table('assaign_days')->where('user_id', $user_id)->orderBy('day', 'ASC')->get();
+        if(!empty($assign_days)){
+            foreach ($assign_days as $key => $day) {
+                $assign_time = DB::table('assign_time')->where('user_id', $day->user_id)->where('day_id', $day->day)->orderBy('day_id', 'ASC')->get();
+                $assign_days[$key]->assign_time = $assign_time;
+            }
+        }
+        if(!empty($assign_days)){
+            return response(['status' => 1,'data' => $assign_days]);
         }else{
             return response(['status' => 1,'data' => '']);
         }
