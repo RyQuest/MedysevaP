@@ -109,9 +109,16 @@ Route::prefix('doctor')->group(function(){
         Route::post('appointments',   [DoctorController::class, 'appointments']);
         
         Route::post('appointment/list/by_date',   [DoctorController::class, 'appointmentListByDate']);
+        
+        Route::post('appointment/view',   [DoctorController::class, 'appointmentView']);
 
         Route::post('appointment/schedule', [DoctorController::class, 'schedule']);
         Route::post('appointment/schedule/add', [DoctorController::class, 'addSchedule']);
+        
+        Route::post('live_consults',   [DoctorController::class, 'liveConsults']);
+        Route::post('live_consult/edit',   [DoctorController::class, 'liveConsultEdit']);
+        
+        Route::post('appointment/join',   [DoctorController::class, 'appointmentJoin']);
 });
 
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Chamber;
+use Illuminate\Support\Facades\DB;
 
 $vle_comission = 19;
 $partner_comission = 9.50;
@@ -86,24 +87,105 @@ function trxInfo($vle_id,$trx_id,$category){
 function apiUrl(){
     return "https://clinic.medyseva.com/";
 }
-// function create_compact_serial_number($table, $chamber_uid)
-//     {
 
-//         $chamber_res = Chamber::where('uid',$chamber_uid)->first();
 
-//         if(!empty($chamber_res)){
-//             $total_xValue = count($ci->common_model->get_all($table)) + intval(1);
+if(!function_exists('amount_to_doctor')){
+    function amount_to_doctor($appointment_id, $doctor_id, $amount){
 
-//             if( $table == 'invoices'){
-//                 // Generate New Invoice Number in formate of HPD/2022/0001 
-//                 $compact_serial_number = strtoupper(substr($chamber_res[0]->name, 0, 3)).'/'. date('Y') .'/'. str_repeat('0', (4 - strlen($total_xValue) ) ).$total_xValue;
-//             }else{
-//                 $compact_serial_number = strtoupper(substr($chamber_res[0]->name, 0, 3)).'/'. str_repeat('0', (4 - strlen($total_xValue) ) ).$total_xValue;
-//             }
+        $doctorTds = ($amount * 10) / 100;
 
-//             return $compact_serial_number;
-//         }else{
-//             return null;
-//         }
-//     }
+        $old_trx = DB::table('trx_history')->where('appointment_id', $appointment_id)->where('category', 'appointment')->first();
+
+        // admin wallet
+        $adminWallet = DB::table('user_wallet')->where('id', 4)->first();
+        $adminNewAmount = $adminWallet->amount;
+        $adminNewAmount = $adminNewAmount - $amount;
+
+
+        // doctor wallet
+        $docWallet = DB::table('user_wallet')->where('user_id', $doctor_id)->where('user_role', 'user')->first();
+        $docNewAmount = $docWallet->amount;
+
+        $docNewAmount = $docNewAmount + $amount;
+
+        if (isset($old_trx)) {
+            $data1 = array(
+                'user_id' => $doctor_id,
+                'trx_id' => $old_trx->trx_id,
+                'user_role' => 'user',
+                'wallet_id' => $docWallet->id,
+                'from_wallet' => 4,
+                'to_wallet' => $docWallet->id,
+                'category' => 'appointment_referral',
+                'appointment_id' => $appointment_id,
+                'amount' => $amount,
+                'doctor_fee' => 0,
+                'junior_doctor_fee' => 0,
+                'vle_referral' => 0,
+                'partner_referral' => 0,
+                'medyseva_referral' => 0,
+                'created_at' => my_date_now(),
+                'updated_at' => my_date_now(),
+                'current_amount' => $adminNewAmount,
+                'receiver_amount' => $docNewAmount,
+                'patient_id' => $old_trx->patient_id
+            );
+
+            // $ids = $ci->admin_model->insert($data1, 'trx_history');
+            $ids = DB::table('trx_history')->insert($data1);
+
+            // doctor tds
+
+            $adminNewAmount = $adminNewAmount + $doctorTds;
+            $docNewAmount = $docNewAmount - $doctorTds;
+
+            $data1 = array(
+                'user_id' => 1,
+                'trx_id' => $old_trx->trx_id,
+                'user_role' => 'admin',
+                'wallet_id' => 4,
+                'from_wallet' => $docWallet->id,
+                'to_wallet' => 4,
+                'category' => 'tds',
+                'appointment_id' => $appointment_id,
+                'amount' => $doctorTds,
+                'doctor_fee' => 0,
+                'junior_doctor_fee' => 0,
+                'vle_referral' => 0,
+                'partner_referral' => 0,
+                'medyseva_referral' => 0,
+                'created_at' => my_date_now(),
+                'updated_at' => my_date_now(),
+                'current_amount' => $docNewAmount,
+                'receiver_amount' => $adminNewAmount,
+                'patient_id' => $old_trx->patient_id
+            );
+
+            $ids = DB::table('trx_history')->insert($data1);
+
+            // update doctor wallet
+            DB::table('user_wallet')->where('id', $docWallet->id)->update($action);
+            
+            // update admin wallet
+            $action = array('amount' => $adminNewAmount);
+            DB::table('user_wallet')->where('id', 4)->update($action);
+        }        
+    }
+}
+
+// current date time function
+
+if (!function_exists('my_date_now')) {
+
+    function my_date_now()
+    {
+
+        $dt = new DateTime('now', new DateTimezone('Asia/Dhaka'));
+
+        $date_time = $dt->format('Y-m-d H:i:s');
+
+        return $date_time;
+    }
+}
+
 ?>

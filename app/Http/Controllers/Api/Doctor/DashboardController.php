@@ -25,6 +25,7 @@ class DashboardController extends Controller
         $data['all_appointments'] = DB::table('appointments')->count();
         $data['latest_appointments'] = DB::table('appointments')->where('status', 0)->where('created_at', '>', date('Y-m-d'))->count();
 
+
         $dr_query = DB::table('appointments');
         if($user->chamber_id > 0)        {
             $dr_query->where('chamber_id',$chamber_uid);

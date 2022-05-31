@@ -90,6 +90,7 @@ class DoctorController extends Controller
         foreach ($appointments as $key => $value) {
 
             $appointments[$key]->patient = DB::table('patientses')->where('id', $value->patient_id)->first();
+            $appointments[$key]->chamber = DB::table('chamber')->where('uid', $value->chamber_id)->first();
 
             $query2 = DB::table('prescription as p');
             $query2->where('p.patient_id', $value->patient_id);
@@ -110,12 +111,27 @@ class DoctorController extends Controller
                     $appointments[$key]->payment_status = 0;
                 }
             }
-
         }
-
 
         if(!empty($appointments)){
             return response(['status' => 1,'data' => $appointments]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
+
+    /* get appointment view of patient and doctor*/
+    public function appointmentView(Request $request){
+        $appointment_id = $request->input('appointment_id');
+
+        $appointment = DB::table('appointments')->where('id', $appointment_id)->orderBy('date', 'DESC')->first();
+        if(!empty($appointment)){
+            $patient = DB::table('patientses')->select('name', 'mobile', 'email', 'mr_number', 'report')->where('id', $appointment->patient_id)->first();
+            $appointment->patient = $patient;
+        }
+
+        if(!empty($appointment)){
+            return response(['status' => 1,'data' => $appointment]);
         }else{
             return response(['status' => 1,'data' => '']);
         }
@@ -159,6 +175,139 @@ class DoctorController extends Controller
         }else{
             return response(['status' => 1,'data' => '']);
         }
+    }
+
+    /* get all appoinments data */
+    public function liveConsults(Request $request){
+        
+        $user_id     = $request->input('user_id');
+        $chamber_uid = $request->input('chamber_uid');
+        $offset      = $request->input('offset');
+        $limit       = $request->input('limit');
+        
+        $user = User::find($user_id);
+
+
+        $dr_query = DB::table('appointments');
+
+        if($user->chamber_id > 0)        {
+            $dr_query->where('chamber_id',$chamber_uid);
+        }
+
+        /*if($user->doctor_type == "0"){
+            $dr_query->where('appointment_type', 1);
+        } else if($user->doctor_type == 1){
+            $dr_query->where('user_id', $user->id );
+        }*/
+
+        $dr_query->where('user_id', $user->id );
+        $dr_query->orderBy('id', 'DESC');
+        $dr_query->skip($offset);
+        $dr_query->take($limit);
+
+        $appointments = $dr_query->get();
+
+        foreach ($appointments as $key => $value) {
+
+            /* get consult patient */
+            $patient = DB::table('patientses')->select('name', 'mobile', 'email', 'mr_number');
+            $patient->where('id', $value->patient_id);
+            $appointments[$key]->patient = $patient->first();
+
+            /* get consult chamber */
+            $chamber = DB::table('chamber')->select('name');
+            $chamber->where('uid', $value->chamber_id);
+            $appointments[$key]->chamber = $chamber->first();
+
+            /* get consult users */
+            $user = DB::table('users')->select('name');
+            $user->where('id', $value->user_id);
+            $appointments[$key]->doctor = $user->first();
+
+            /* get consult payment users */
+            $payment_user = DB::table('payment_user')->select('status');
+            $payment_user->where('appointment_id', $value->id);
+            $appointments[$key]->payment_user = $payment_user->first();
+        }
+
+        if(!empty($appointments)){
+            return response(['status' => 1,'data' => $appointments]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
+
+    /* edit live consult*/
+    public function liveConsultEdit(Request $request){
+        $appointment_id = $request->input('appointment_id');
+        $chamber_id     = $request->input('chamber_id');
+        $time           = $request->input('time');
+        $date           = $request->input('date');
+        $meeting_notes  = $request->input('meeting_notes');
+        
+        $data = array(
+            'date' => date('Y-m-d', strtotime($date)),
+            'time' => $time,
+            'meeting_notes' => $meeting_notes,
+        );
+        $res = DB::table('appointments')
+                ->where('id', $appointment_id)
+                ->update($data);
+
+        if(!empty($res)){
+            return response(['status' => 1,'data' => $res]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
+
+    /* Join Patiant appointment by doctor */
+    public function appointmentJoin(Request $request){
+        
+        $appointment_id = $request->input('appointment_id');
+        $user_id        = $request->input('user_id');
+
+        $user = User::find($user_id);
+
+        $appoint = DB::table('appointments')->where('id', $appointment_id)->first();
+            
+            if($user->role == "vle" || $user->role == "staff"){
+                $data = array(
+                    'status' => 1,
+                    'link' => $appoint->video_link
+                );
+            }
+            else if ($appoint->user_id == 0 || null == $appoint->user_id || $appoint->is_joined == "0") {
+                $data = array(
+                    'status' => 1,
+                    'link' => $appoint->video_link
+                );
+
+                $array = array('user_id' => $user->id, 'is_joined' => 1, 'status' => 1);
+                DB::table('appointments')->where('id', $appointment_id)->update($array);
+
+                if($appointch->amber_id != '24163'){
+                    // amount to doctor
+                    $doctorAmount = $appoint->appointment_type == 1 ? 85 : 300;
+                    amount_to_doctor($appoint->id, $user->id, $doctorAmount);
+                }
+
+            } else {
+                if ($user->id == $appoint->user_id) {
+                    $data = array(
+                        'status' => 1,
+                        'link' => $appoint->video_link
+                    );
+                } else {
+                    $data = array(
+                        'status' => 0,
+                        'msg' => 'This patient is already attended by another doctor',
+                        'link' => ''
+                    );
+                }
+            }
+
+            return response($data);
     }
 }
 
