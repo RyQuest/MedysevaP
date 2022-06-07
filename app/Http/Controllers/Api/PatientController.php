@@ -121,7 +121,7 @@ class PatientController extends Controller
     public function importPatient(Request $request)
     {
         ini_set('max_execution_time', 500);
-        // ini_set('memory_limit', '1600M');
+        ini_set('memory_limit', '1600M');
         $data = \Excel::toArray([], $request->file('file'));
         // return response([$data[0]]);
         foreach ($data[0] as $key => $row) {
