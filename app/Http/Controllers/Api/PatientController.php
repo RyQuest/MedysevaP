@@ -129,6 +129,10 @@ class PatientController extends Controller
                 if ($row[0]) {
                     $patient = null;
                     $patient = Patients::where('email', $row[4])->first();
+                    if($patient){
+                        Patients::where('id', $patient->id)->update(['age' => $row[6]]);
+                    }
+                    dd();
                     $date = date('Y-m-d H:i:s');
 
                     $about_id = 0;
