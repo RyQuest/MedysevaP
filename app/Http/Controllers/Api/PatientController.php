@@ -130,7 +130,12 @@ class PatientController extends Controller
                     $patient = null;
                     $patient = Patients::where('email', $row[4])->first();
                     if($patient){
-                        Patients::where('id', $patient->id)->update(['age' => $row[6]]);
+                        Patients::where('id', $patient->id)->update(['chamber_id' => $row[29]]);
+                        $appointment = Appointment::where('patient_id',$patient->id)->first();
+                        if($appointment){
+                            $appointment = Appointment::where('patient_id',$patient->id)->update(['chamber_id' => $row[29]]);
+                            Prescriptions::where('appointment_id',$appointment->id)->update(['chamber_id' => $row[29]]);
+                        }
                     }
                     // return 1;
                     // $date = date('Y-m-d H:i:s');
