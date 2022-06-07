@@ -192,7 +192,7 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => '/var/www/html/laravels/MedysevaP/storage/framework/cache/data',
+        'path' => '/var/www/html/MedysevaP/storage/framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -287,7 +287,7 @@
         'port' => '3306',
         'database' => 'medyseva',
         'username' => 'root',
-        'password' => 'root',
+        'password' => 'password',
         'unix_socket' => '',
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_unicode_ci',
@@ -307,7 +307,7 @@
         'port' => '3306',
         'database' => 'medyseva',
         'username' => 'root',
-        'password' => 'root',
+        'password' => 'password',
         'charset' => 'utf8',
         'prefix' => '',
         'prefix_indexes' => true,
@@ -322,7 +322,7 @@
         'port' => '3306',
         'database' => 'medyseva',
         'username' => 'root',
-        'password' => 'root',
+        'password' => 'password',
         'charset' => 'utf8',
         'prefix' => '',
         'prefix_indexes' => true,
@@ -363,12 +363,12 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/laravels/MedysevaP/storage/app',
+        'root' => '/var/www/html/MedysevaP/storage/app',
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => '/var/www/html/laravels/MedysevaP/storage/app/public',
+        'root' => '/var/www/html/MedysevaP/storage/app/public',
         'url' => 'http://127.0.0.1:8000/storage',
         'visibility' => 'public',
       ),
@@ -386,7 +386,7 @@
     ),
     'links' => 
     array (
-      '/var/www/html/laravels/MedysevaP/public/storage' => '/var/www/html/laravels/MedysevaP/storage/app/public',
+      '/var/www/html/MedysevaP/public/storage' => '/var/www/html/MedysevaP/storage/app/public',
     ),
   ),
   'hashing' => 
@@ -456,13 +456,13 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => '/var/www/html/laravels/MedysevaP/storage/logs/laravel.log',
+        'path' => '/var/www/html/MedysevaP/storage/logs/laravel.log',
         'level' => 'debug',
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => '/var/www/html/laravels/MedysevaP/storage/logs/laravel.log',
+        'path' => '/var/www/html/MedysevaP/storage/logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
       ),
@@ -513,7 +513,7 @@
       ),
       'emergency' => 
       array (
-        'path' => '/var/www/html/laravels/MedysevaP/storage/logs/laravel.log',
+        'path' => '/var/www/html/MedysevaP/storage/logs/laravel.log',
       ),
     ),
   ),
@@ -579,7 +579,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => '/var/www/html/laravels/MedysevaP/resources/views/vendor/mail',
+        0 => '/var/www/html/MedysevaP/resources/views/vendor/mail',
       ),
     ),
   ),
@@ -684,7 +684,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => '/var/www/html/laravels/MedysevaP/storage/framework/sessions',
+    'files' => '/var/www/html/MedysevaP/storage/framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -704,9 +704,9 @@
   array (
     'paths' => 
     array (
-      0 => '/var/www/html/laravels/MedysevaP/resources/views',
+      0 => '/var/www/html/MedysevaP/resources/views',
     ),
-    'compiled' => '/var/www/html/laravels/MedysevaP/storage/framework/views',
+    'compiled' => '/var/www/html/MedysevaP/storage/framework/views',
   ),
   'flare' => 
   array (
@@ -853,7 +853,7 @@
     ),
     'temporary_files' => 
     array (
-      'local_path' => '/var/www/html/laravels/MedysevaP/storage/framework/cache/laravel-excel',
+      'local_path' => '/var/www/html/MedysevaP/storage/framework/cache/laravel-excel',
       'remote_disk' => NULL,
       'remote_prefix' => NULL,
       'force_resync_remote' => NULL,

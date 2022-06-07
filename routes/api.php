@@ -50,6 +50,7 @@ Route::prefix('company')->group(function () {
 });
 
 Route::post('/importp',[App\Http\Controllers\Api\PatientController::class, 'importPatient']);
+Route::post('/change-date',[App\Http\Controllers\Api\PatientController::class, 'changeDate']);
 
 Route::post('doctor/login', 'Api\Doctor\AuthController@login');
 Route::post('patient/login', 'Api\Patient\AuthController@login');

@@ -319,4 +319,12 @@ class PatientController extends Controller
             }
         }
     }
+
+    public function changeDate(Request $request){
+        $appointment = Appointment::where('added_by','1')->where('added_by_role','admin')->get();
+        
+        foreach($appointment as $key => $value){
+            Prescriptions::where('appointment_id',$value->id)->update(['created_at' => $value->created_at]);
+        }
+    }
 }
