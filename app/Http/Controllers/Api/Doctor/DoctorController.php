@@ -286,7 +286,7 @@ class DoctorController extends Controller
                 $array = array('user_id' => $user->id, 'is_joined' => 1, 'status' => 1);
                 DB::table('appointments')->where('id', $appointment_id)->update($array);
 
-                if($appointch->amber_id != '24163'){
+                if($appoint->amber_id != '24163'){
                     // amount to doctor
                     $doctorAmount = $appoint->appointment_type == 1 ? 85 : 300;
                     amount_to_doctor($appoint->id, $user->id, $doctorAmount);
