@@ -132,7 +132,7 @@ class PatientController extends Controller
                     if($patient){
                         Patients::where('id', $patient->id)->update(['age' => $row[6]]);
                     }
-                    dd();
+                    return 1;
                     $date = date('Y-m-d H:i:s');
 
                     $about_id = 0;
