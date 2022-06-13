@@ -309,6 +309,79 @@ class DoctorController extends Controller
 
             return response($data);
     }
+
+    /* search appoinments data */
+        public function search_appointments(Request $request){
+            $user_id     = $request->input('user_id');
+            $chamber_uid = $request->input('chamber_uid');
+            $offset      = $request->input('offset');
+            $limit       = $request->input('limit');
+            $name        = $request->input('name');
+            
+            $user = User::find($user_id);
+    
+            $dr_query = DB::table('appointments');
+            // $dr_query->leftJoin('patientses', 'patientses.id', '=', 'appointments.patient_id');
+    
+            if($user->chamber_id > 0)        {
+                $dr_query->where('chamber_id',$chamber_uid);
+            }
+    
+            /*if($user->doctor_type == "0"){
+                $dr_query->where('appointment_type',"1");
+            } else if($user->doctor_type == "1"){
+                $dr_query->where('user_id', $user->id);
+            }*/
+    
+            if (!empty($name)) {
+                $patient_name = DB::table('patientses')->orWhere('name', 'like', '%' . $name . '%')->first();
+                if($patient_name){
+                    $dr_query->where('patient_id', $patient_name->id);
+                }else{
+                    $dr_query->where('patient_id', 0);
+                } 
+                // $dr_query->orderBy('date', 'ASC');
+            }
+    
+            // $dr_query->orderBy('serial_id', $name);
+    
+            $dr_query->skip($offset);
+            $dr_query->take($limit);
+    
+            $appointments = $dr_query->get();
+    
+            foreach ($appointments as $key => $value) {
+    
+                $appointments[$key]->patient = DB::table('patientses')->where('id', $value->patient_id)->first();
+                $appointments[$key]->chamber = DB::table('chamber')->where('uid', $value->chamber_id)->first();
+    
+                $query2 = DB::table('prescription as p');
+                $query2->where('p.patient_id', $value->patient_id);
+                $query2->where(DB::raw("(DATE_FORMAT(p.created_at,'%Y-%m-%d'))"), $value->date);
+                $appointments[$key]->is_done = $query2->count();
+    
+                // User Payment status
+                $query3 = DB::table('payment_user');
+                $query3->where('user_id', $value->user_id);
+                $query3->where('appointment_id', $value->id);
+                $payment = $query3->first();
+                if (empty($payment)) {
+                    $appointments[$key]->payment_status = 0;
+                } else {
+                    if ($payment->status == 'verified') {
+                        $appointments[$key]->payment_status = 1;
+                    } else {
+                        $appointments[$key]->payment_status = 0;
+                    }
+                }
+            }
+    
+            if(!empty($appointments)){
+                return response(['status' => 1,'data' => $appointments]);
+            }else{
+                return response(['status' => 1,'data' => 'Data not found']);
+            }
+        }
 }
 
 ?>

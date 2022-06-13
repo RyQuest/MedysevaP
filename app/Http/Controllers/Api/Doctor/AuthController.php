@@ -184,4 +184,36 @@ class AuthController extends Controller
                 ]);
         }
     }
+
+    public function forgot_password(Request $request)
+    {
+        $validator = \Validator::make($request->all(),[
+            'email' => 'required',
+        ]);
+        
+        if($validator->fails()){
+             return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+        }
+        
+        $user = User::where('email',$request->email)->first();
+        if($user){
+            $password = mt_rand(10000000,99999999);
+            $user->password = Hash::make($password);
+            $user->save();
+            $email = $request->email;
+            $data = array(
+                // 'name'=>$request->name,
+                'password'=>$password,
+            );
+            Mail::send('emails/passwordreset', $data, function($message) use($email) {
+                $message->to($email, 'Medyseva')->subject('Medyseva Reset Passwoed');
+                $message->from('Medyseva@gmail.com','Medyseva');
+            });
+            return response()->json(['status' => 1,"msg" => 'New password is sent on your email id.']);
+        }else{
+            return response()->json(['status' => 0,"msg" => 'User not found']);
+        }
+        
+        
+    }
 }

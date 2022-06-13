@@ -223,11 +223,100 @@ class PrescriptionController extends Controller
 
 
     public function create(Request $request){
-        dd($request->all());
+        // dd($request->all());
         /*$user_id = $request->input('user_id');
         $user_role = $request->input('user_role');*/
-        DB::beginTransaction();
-        DB::commit();
+        // DB::beginTransaction();
+        // DB::commit();
+        // $patient_id=$request->input('patient_id');
+        // $app_id = DB::table('appointments')->where('patient_id',$patient_id)->first();
+        // $data = array(
+        //         'chamber_id' => $app_id->chamber_id,
+
+        //         'patient_id' =>  $patient_id,
+
+        //         'appointment_id' => $app_id->id,
+
+        //         't' => $request->input('t'),
+
+        //         'p' => $request->input('p'),
+
+        //         'r' => $request->input('r'),
+
+        //         'bp' => $request->input('bp'),
+
+        //         'ht' => $request->input('ht'),
+
+        //         'wt' => $request->input('wt'),
+                
+        //         'fbs' => $request->input('fbs'),
+                
+        //         'rbs' => $request->input('rbs'),
+                
+        //         'ppbs' => $request->input('ppbs'),
+                
+        //         'blood_group' => $request->input('blood_group'),
+
+        //         'spo2' => $request->input('spo2'),
+
+        //         'chief_complains' => $request->input('chief_complains'),
+
+        //         'med_histry' => $request->input('med_histry'),
+
+        //         'allergies' => $request->input('allergies'),
+
+        //         'past_history' => $request->input('past_history'),
+
+        //         'personal_history' => $request->input('personal_history'),
+  
+        //        'next_visit' => $request->input('next_visit'),
+
+        //         'user_id' => $request->input('user_id'),
+
+        //         'created_at' => date('Y-m-d H:i:s'),
+        //    );
+
+        //    $prescription_id = $this->admin_model->insert($data,'prescription');
+         
+        // /***************Send Mail ******************/
+        
+        // $patient = $this->admin_model->get_patient_info(session('patient_id'));
+
+        // $subject = 'Prescription for your Appointment on '.$prescription['created_at'];
+        
+        // $msg = $msg."<br/><br/>";
+
+        // $msg = $msg. 'Hi '.$patient->name.', <br/><br/> link to your prescription that you had with Dr. '.$prescription['user_name'];
+        
+        // $msg = $msg. "<br/><br/>";
+
+        // $msg = $msg. "Click here ".$link; 
+
+        // $msg = $msg. "<br/><br/>";
+
+        // $msg = $msg. 'Any issues please email to info@medyseva.com';
+
+        // $msg = $msg. "<br/><br/><br/>";
+        
+        // $msg = $msg. 'Best Regards,';           
+
+        // $msg = $msg."<br/>";
+
+        // $msg = $msg. 'The Medyseva Team';
+
+        // $msg = $msg. "<br/><br/><br/>";
+
+        // $msg = $msg. 'Phone - 75669 75666';
+
+        // $msg = $msg."<br/>";
+
+        // $msg = $msg. 'Email - info@medyseva.com';
+
+        // $msg = $msg."<br/>";
+
+        // $msg = $msg. 'Website: www.medyseva.com';
+        
+        // $this->email_model->send_email($patient->email, $subject, $msg);
     }
     
     public function diagonosis(Request $request){
@@ -282,7 +371,7 @@ class PrescriptionController extends Controller
     
     public function patientses(Request $request){
         $user_id    = $request->input('user_id');
-        $patientses = DB::table('patientses')->get();
+        $patientses = DB::table('patientses')->paginate(15);
         if(!empty($patientses)){
             return response(['status' => 1,'data' => $patientses]);
         }else{
