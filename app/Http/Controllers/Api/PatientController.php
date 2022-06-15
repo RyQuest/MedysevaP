@@ -129,125 +129,128 @@ class PatientController extends Controller
                 if ($row[0]) {
                     $patient = null;
                     $patient = Patients::where('email', $row[4])->first();
-                    if($patient){
+                    /*if($patient){
                         Patients::where('id', $patient->id)->update(['chamber_id' => $row[8]]);
                         $appointment = Appointment::where('patient_id',$patient->id)->first();
                         if($appointment){
                             Appointment::where('patient_id',$patient->id)->update(['chamber_id' => $row[8]]);
                             Prescriptions::where('appointment_id',$appointment->id)->update(['chamber_id' => $row[8]]);
                         }
-                    }
+                    }*/
                     // return 1;
-                    // $date = date('Y-m-d H:i:s');
+                    $date = date('Y-m-d H:i:s');
 
-                    // $about_id = 0;
-                    // $about = strtolower($row[10]);
+                    $about_id = 0;
+                    $about = strtolower($row[10]);
 
-                    // if ($about == "website") {
-                    //     $about_id = "1";
-                    // } else if ($about == "instagram") {
-                    //     $about_id = "2";
-                    // } else if ($about == "instagram") {
-                    //     $about_id = "2";
-                    // } else if ($about == "fFacebook") {
-                    //     $about_id = "3";
-                    // } else if ($about == "whatsapp") {
-                    //     $about_id = "4";
-                    // } else if ($about == "hoardings") {
-                    //     $about_id = "5";
-                    // } else if ($about == "pamphlet" || $about == "pamphlets") {
-                    //     $about_id = "6";
-                    // } else if ($about == "word of mouth") {
-                    //     $about_id = "7";
-                    // } else if ($about == "Doctor ") {
-                    //     $about_id = "8";
-                    // } else if ($about == "other") {
-                    //     $about_id = "9";
-                    // } else if ($about == "school") {
-                    //     $about_id = "10";
-                    // } else if ($about == "vehicle") {
-                    //     $about_id = "11";
-                    // } else if ($about == "no reply") {
-                    //     $about_id = "12";
-                    // }
+                    if ($about == "website") {
+                        $about_id = "1";
+                    } else if ($about == "instagram") {
+                        $about_id = "2";
+                    } else if ($about == "instagram") {
+                        $about_id = "2";
+                    } else if ($about == "fFacebook") {
+                        $about_id = "3";
+                    } else if ($about == "whatsapp") {
+                        $about_id = "4";
+                    } else if ($about == "hoardings") {
+                        $about_id = "5";
+                    } else if ($about == "pamphlet" || $about == "pamphlets") {
+                        $about_id = "6";
+                    } else if ($about == "word of mouth") {
+                        $about_id = "7";
+                    } else if ($about == "Doctor ") {
+                        $about_id = "8";
+                    } else if ($about == "other") {
+                        $about_id = "9";
+                    } else if ($about == "school") {
+                        $about_id = "10";
+                    } else if ($about == "vehicle") {
+                        $about_id = "11";
+                    } else if ($about == "no reply") {
+                        $about_id = "12";
+                    }
 
+                    if ($row[2] != NULL || $row[2] != 'NULL') {
+                        // $date = date('Y-m-d H:i:s', strtotime($row[2]));
+                        $date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[2])->format('Y-m-d H:i:s');
+                    }
+                    $patient_count = Patients::where('chamber_id', $row[8])->count();
+                    $patient_count = $patient_count + 1;
 
+                    if (null == $patient) {
+                        $patient_data = [
+                            'chamber_id' => $row[8],
+                            'user_id' => $row[0],
+                            'name' => $row[3],
+                            'email' => $row[4] != NULL ? $row[4] : null,
+                            'mobile' => $row[5] != NULL ? $row[5] : null,
+                            'mr_number' => "MED/2022/" . $patient_count,
+                            'age' => intval($row[6]),
+                            'weight' => $row[17],
+                            'sex' => $row[11] == "Female" || $row[11] == "female" ? 2 : 1,
+                            'role' => 'patient',
+                            'password' => bcrypt(123456),
+                            'created_at' => $date,
+                            'about_id' => $about_id,
+                            'added_by' => 1,
+                            'added_by_role' => 1,
+                            'present_address' => $row[9]
+                        ];
+                        $patient = Patients::create($patient_data);
+                    }
 
-                    // if ($row[2] != NULL || $row[2] != 'NULL') {
-                    //     $date = date('Y-m-d H:i:s', strtotime($row[2]));
-                    // }
-                    // $patient_count = Patients::where('chamber_id', $row['29'])->count();
-                    // $patient_count = $patient_count + 1;
+                    $serial = Appointment::where('status', 0)->where('date', $date)->orderBy('id', 'desc')->count();
+                    $appointment_data = [
+                        'chamber_id' => $row[8],
+                        'user_id' => $row[0],
+                        'patient_id' => $patient->id,
+                        'camp_type' => "on_line",
+                        'camp_name' => "Internal Medicine",
 
-                    // if (null == $patient) {
-                    //     $patient = Patients::create([
-                    //         'chamber_id' => $row['29'],
-                    //         'user_id' => $row[0],
-                    //         'name' => $row[3],
-                    //         'email' => $row[4] != NULL ? $row[4] : null,
-                    //         'mobile' => $row[5] != NULL ? $row[5] : null,
-                    //         'mr_number' => "MED/2022/" . $patient_count,
-                    //         'age' => $row[5],
-                    //         'weight' => $row[17],
-                    //         'sex' => $row[11] == "Female" || $row[11] == "female" ? 2 : 1,
-                    //         'role' => 'patient',
-                    //         'password' => bcrypt(123456),
-                    //         'created_at' => $date,
-                    //         'about_id' => $about_id,
-                    //         'added_by' => 1,
-                    //         'added_by_role' => 1,
-                    //         'present_address' => $row[8]
-                    //     ]);
-                    // }
+                        'serial_id' => $serial,
 
-                    // $serial = Appointment::where('status', 0)->where('date', $date)->orderBy('id', 'desc')->count();
-                    // $app = Appointment::create([
-                    //     'chamber_id' => $row['29'],
-                    //     'user_id' => $row[0],
-                    //     'patient_id' => $patient->id,
-                    //     'camp_type' => "on_line",
-                    //     'camp_name' => "Internal Medicine",
+                        'date' => $date,
 
-                    //     'serial_id' => $serial,
+                        'time' => "0",
 
-                    //     'date' => $date,
+                        'status' => 0,
 
-                    //     'time' => "0",
+                        'type' => "",
 
-                    //     'status' => 0,
+                        't' => $row[12],
 
-                    //     'type' => "",
+                        'p' => $row[13],
 
-                    //     't' => $row[12],
+                        'r' => $row[14],
 
-                    //     'p' => $row[13],
+                        'bp' => $row[15],
 
-                    //     'r' => $row[14],
+                        'ht' => $row[16],
 
-                    //     'bp' => $row[15],
+                        'wt' => $row[17],
 
-                    //     'ht' => $row[16],
+                        'spo2' => $row[18],
 
-                    //     'wt' => $row[17],
+                        'chief_complains' => $row[19],
+                        'consultations_type'  => "",
+                        'med_histry' => $row[20],
+                        'past_history' => $row[21],
+                        'personal_history' => $row[22],
 
-                    //     'spo2' => $row[18],
+                        'allergies' => $row[23],
 
-                    //     'chief_complains' => $row[19],
-                    //     'consultations_type'  => "",
-                    //     'med_histry' => $row[20],
+                        'prov_diagn' => "",
+                        'center_location' => "",
 
-                    //     'allergies' => $row[23],
+                        'follow_up' => "",
 
-                    //     'prov_diagn' => "",
-                    //     'center_location' => "",
-
-                    //     'follow_up' => "",
-
-                    //     'created_at' => $date,
-                    //     'added_by' => "1",
-                    //     'added_by_role' => "admin",
-                    //     'appointment_type' => "1"
-                    // ]);
+                        'created_at' => $date,
+                        'added_by' => "1",
+                        'added_by_role' => "admin",
+                        'appointment_type' => "1"
+                    ];
+                    $app = Appointment::create($appointment_data);
 
 
                     // create prescrption
