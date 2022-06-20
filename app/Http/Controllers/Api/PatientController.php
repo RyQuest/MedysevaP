@@ -129,15 +129,6 @@ class PatientController extends Controller
                 if ($row[0]) {
                     $patient = null;
                     $patient = Patients::where('email', $row[4])->first();
-                    /*if($patient){
-                        Patients::where('id', $patient->id)->update(['chamber_id' => $row[8]]);
-                        $appointment = Appointment::where('patient_id',$patient->id)->first();
-                        if($appointment){
-                            Appointment::where('patient_id',$patient->id)->update(['chamber_id' => $row[8]]);
-                            Prescriptions::where('appointment_id',$appointment->id)->update(['chamber_id' => $row[8]]);
-                        }
-                    }*/
-                    // return 1;
                     $date = date('Y-m-d H:i:s');
 
                     $about_id = 0;
@@ -172,7 +163,6 @@ class PatientController extends Controller
                     }
 
                     if ($row[2] != NULL || $row[2] != 'NULL') {
-                        // $date = date('Y-m-d H:i:s', strtotime($row[2]));
                         $date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[2])->format('Y-m-d H:i:s');
                     }
                     $patient_count = Patients::where('chamber_id', $row[8])->count();
@@ -201,7 +191,8 @@ class PatientController extends Controller
                     }
 
                     $serial = Appointment::where('status', 0)->where('date', $date)->orderBy('id', 'desc')->count();
-                    $appointment_data = [
+                    
+                    $app = Appointment::create([
                         'chamber_id' => $row[8],
                         'user_id' => $row[0],
                         'patient_id' => $patient->id,
@@ -249,83 +240,7 @@ class PatientController extends Controller
                         'added_by' => "1",
                         'added_by_role' => "admin",
                         'appointment_type' => "1"
-                    ];
-                    $app = Appointment::create($appointment_data);
-
-
-                    // create prescrption
-                    /*$pre = Prescriptions::create([
-                        'chamber_id' => $app->chamber_id,
-
-                        'patient_id' => $patient->id,
-                        'appointment_id' => $app->id,
-                        't' => $row[9],
-
-                        'p' => $row[10],
-
-                        'r' => $row[11],
-
-                        'bp' => $row[12],
-
-                        'ht' => $row[13],
-
-                        'wt' => $row[14],
-
-                        'spo2' => $row[15],
-
-                        'chief_complains' =>  $row[16],
-
-                        'med_histry' => $row[17],
-
-                        'allergies' => $row[20],
-
-                        'past_history' => $row[18],
-
-                        'personal_history' => $row[19],
-
-                        'next_visit' => '',
-
-                        'user_id' => $app->user_id,
-
-                        'created_at' =>$date,
-                    ]);*/
-
-                    /*$diagonosis = $row[28];
-                    if(null != $diagonosis && $diagonosis != 'NULL'){
-                        $diagonosis = explode(",",$diagonosis);
-                        foreach ($diagonosis as $value_1) {
-                            $data_1 = array(           
-                               'prescription_id' => $pre->id,           
-                               'diagonosis_id' => $value_1,           
-                            );                   
-                           \DB::table('pre_diagonosis')->insert($data_1);           
-                        }
-                    }*/
-                    /*$ad_advice = $row[24];
-                    if(null != $ad_advice && $ad_advice != 'NULL'){
-                        $ad_advice = explode(",",$ad_advice);
-
-                        foreach ($ad_advice as $value_2) {
-                            $data_2 = array(           
-                               'prescription_id' => $app->id,           
-                               'ad_advices_id' => $value_2,           
-                            ); 
-                            \DB::table('pre_ad_advices')->insert($data_2);
-                        }
-                    }*/
-
-                    /*$advice = $row[26];
-                    if(null != $advice && $advice != 'NULL'){
-                        $advice = explode(",",$advice);
-
-                        foreach ($advice as $value_2) {
-                            $data_2 = array(
-                               'prescription_id' => $app->id,
-                               'advice_id' => $value_2,
-                            );
-                            \DB::table('pre_advice')->insert($data_2);
-                        }
-                    }*/
+                    ]);
                 }
                 // \Log::info($app);
             }
