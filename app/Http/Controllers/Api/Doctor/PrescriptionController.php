@@ -282,7 +282,13 @@ class PrescriptionController extends Controller
     
     public function patientses(Request $request){
         $user_id    = $request->input('user_id');
-        $patientses = DB::table('patientses')->get();
+        $offset     = $request->input('offset');
+        $limit      = $request->input('limit');
+        
+        $patientses = DB::table('patientses')
+                        ->skip($offset)
+                        ->take($limit)
+                        ->get();
         if(!empty($patientses)){
             return response(['status' => 1,'data' => $patientses]);
         }else{

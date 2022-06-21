@@ -50,6 +50,7 @@ Route::prefix('company')->group(function () {
 });
 
 Route::post('/importp',[App\Http\Controllers\Api\PatientController::class, 'importPatient']);
+Route::post('/change-date',[App\Http\Controllers\Api\PatientController::class, 'changeDate']);
 
 Route::post('doctor/login', 'Api\Doctor\AuthController@login');
 Route::post('patient/login', 'Api\Patient\AuthController@login');
@@ -59,6 +60,7 @@ Route::post('patient/reset', 'Api\Patient\AuthController@reset');
 Route::post('patient/register', 'Api\Patient\AuthController@register');
 Route::post('doctor/register', 'Api\Doctor\AuthController@register');
 Route::post('contact', 'Api\Patient\AuthController@contact');
+Route::post('doctor/forgot-password', 'Api\Doctor\AuthController@forgot_password');
 
 Route::group(['middleware' => 'auth.jwt'], function () {
 
@@ -107,6 +109,8 @@ Route::prefix('doctor')->group(function(){
         Route::post('dashboard',   [DashboardController::class, 'dashboard']);
         
         Route::post('appointments',   [DoctorController::class, 'appointments']);
+
+        Route::post('appointments/search',   [DoctorController::class, 'search_appointments']);
         
         Route::post('appointment/list/by_date',   [DoctorController::class, 'appointmentListByDate']);
         
