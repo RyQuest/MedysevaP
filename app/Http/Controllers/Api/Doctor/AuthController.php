@@ -305,6 +305,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 1,
+             'temp_img' => $path,
             'msg' => "Temp image added successfully",
         ]);
     }
