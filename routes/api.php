@@ -59,8 +59,11 @@ Route::post('patient/reset', 'Api\Patient\AuthController@reset');
 
 Route::post('patient/register', 'Api\Patient\AuthController@register');
 Route::post('doctor/register', 'Api\Doctor\AuthController@register');
+Route::post('doctor/degree/add', 'Api\Doctor\AuthController@addDrDegree');
+Route::post('doctor/kyc/add',  'Api\Doctor\AuthController@addDrKyc' );
 Route::post('contact', 'Api\Patient\AuthController@contact');
 Route::post('doctor/forgot-password', 'Api\Doctor\AuthController@forgot_password');
+Route::post('temp_img/add', 'Api\Doctor\AuthController@addTempImg');
 
 Route::group(['middleware' => 'auth.jwt'], function () {
 
@@ -107,21 +110,21 @@ Route::prefix('doctor')->group(function(){
         Route::post('patientses', [PrescriptionController::class, 'patientses']);
 
         Route::post('dashboard',   [DashboardController::class, 'dashboard']);
-        
+
         Route::post('appointments',   [DoctorController::class, 'appointments']);
 
         Route::post('appointments/search',   [DoctorController::class, 'search_appointments']);
-        
+
         Route::post('appointment/list/by_date',   [DoctorController::class, 'appointmentListByDate']);
-        
+
         Route::post('appointment/view',   [DoctorController::class, 'appointmentView']);
 
         Route::post('appointment/schedule', [DoctorController::class, 'schedule']);
         Route::post('appointment/schedule/add', [DoctorController::class, 'addSchedule']);
-        
+
         Route::post('live_consults',   [DoctorController::class, 'liveConsults']);
         Route::post('live_consult/edit',   [DoctorController::class, 'liveConsultEdit']);
-        
+
         Route::post('appointment/join',   [DoctorController::class, 'appointmentJoin']);
 });
 

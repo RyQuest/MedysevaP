@@ -28,6 +28,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'mobile',
+        'phone',
         'role',
         'password',
     ];
@@ -57,13 +58,13 @@ class User extends Authenticatable implements JWTSubject
     //     'subscription' => 'boolean',
     //     'preScanCompleted' => 'boolean',
     // ];
-    
-    
+
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
     }
- 
+
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
      *
