@@ -16,15 +16,19 @@ class DashboardController extends Controller
         $chamber_uid = $request->input('chamber_uid');
         $offset      = $request->input('offset');
         $limit       = $request->input('limit');
-        
+
         $user = User::find($user_id);
 
-        $data['staffs'] = DB::table('staffs')->where('id', $user_id)->orWhere('chamber_id', $user->chamber_id)->count();
-        $data['patients'] = DB::table('patientses')->count();
-        $data['total_today_appointments'] = DB::table('appointments')->where('created_at', date('Y-m-d'))->count();
-        $data['all_appointments'] = DB::table('appointments')->count();
-        $data['latest_appointments'] = DB::table('appointments')->where('status', 0)->where('created_at', '>', date('Y-m-d'))->count();
+        $data['staffs']                                    = DB::table('staffs')->where('id', $user_id)->orWhere('chamber_id', $user->chamber_id)->count();
+        $data['patients']                               = DB::table('patientses')->count();
+        $data['total_today_appointments'] = DB::table('appointments')->where('date', date('Y-m-d'))->where('user_id', $user_id)->count();
+        $data['all_appointments']                   = DB::table('appointments')->where('user_id', $user_id)->count();
+        $data['latest_appointments']            = DB::table('appointments')->where('status', 0)->where('date', '>', date('Y-m-d'))->count();
 
+        $data['total_patients']                  = DB::table('appointments')->where('user_id', $user_id)->count();
+        $data['todays_patients']              = DB::table('appointments')->where('date', date('Y-m-d'))->where('user_id',$user_id)->count();
+        $data['missed_patients']            = DB::table('appointments')->where('date', '<', date('Y-m-d'))->where('user_id',$user_id)->where('status', 0)->count();
+        $data['wallet'] = DB::table('user_wallet')->where('user_id', $user_id)->pluck('amount');
 
         $dr_query = DB::table('appointments');
         if($user->chamber_id > 0)        {
