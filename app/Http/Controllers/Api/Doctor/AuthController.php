@@ -65,12 +65,12 @@ class AuthController extends Controller
         $user->save();
          $email = $request->email;
         $data = array('name'=>$request->name);
-                Mail::send('regmail', $data, function($message) use ($email) {
+                /* Mail::send('regmail', $data, function($message) use ($email) {
                 $message->to($email, 'Medyseva')->subject
                     ('Doctor Registration mail');
                 // $message->from('medyseva@gmail.com','Medyseva');
                 });
-
+ */
         return response()->json([
             'status' => 1,
             'user' => $user,
