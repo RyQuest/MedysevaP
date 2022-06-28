@@ -191,7 +191,7 @@ class PatientController extends Controller
                     }
 
                     $serial = Appointment::where('status', 0)->where('date', $date)->orderBy('id', 'desc')->count();
-                    
+
                     $app = Appointment::create([
                         'chamber_id' => $row[8],
                         'user_id' => $row[0],
@@ -248,8 +248,7 @@ class PatientController extends Controller
     }
 
     public function changeDate(Request $request){
-        $appointment = Appointment::where('added_by','1')->where('added_by_role','admin')->get();
-        
+        $appointment = Appointment::where('added_by','1')->where('added_by_role','admin')->whereBetween('updated_at', ['2022-06-20 00:00:01', '2022-06-20 23:59:59'])->get();
         foreach($appointment as $key => $value){
             Prescriptions::where('appointment_id',$value->id)->update(['created_at' => $value->created_at]);
         }
