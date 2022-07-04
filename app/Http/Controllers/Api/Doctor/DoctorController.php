@@ -33,8 +33,8 @@ class DoctorController extends Controller
             $dr_query->where('user_id', $user->id);
         }*/
 
-        $dr_query->orderBy('date', 'ASC');
-        // $dr_query->orderBy('serial_id', 'desc');
+        // $dr_query->orderBy('date', 'ASC');
+        $dr_query->orderBy('serial_id', 'desc');
 
         $dr_query->skip($offset);
         $dr_query->take($limit);
