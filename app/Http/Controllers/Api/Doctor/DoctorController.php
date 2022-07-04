@@ -164,7 +164,7 @@ class DoctorController extends Controller
     /* get all appoinment schedule of doctor*/
     public function schedule(Request $request){
         $user_id = $request->input('user_id');
-        $assign_days = DB::table('assaign_days')->where('user_id', $user_id)->orderBy('day', 'ASC')->get();
+        $assign_days = DB::table('assign_time')->where('user_id', $user_id)->orderBy('day_id', 'ASC')->get();
         if(!empty($assign_days)){
             foreach ($assign_days as $key => $day) {
                 $assign_time = DB::table('assign_time')->where('user_id', $day->user_id)->where('day_id', $day->day)->orderBy('day_id', 'ASC')->get();
@@ -180,22 +180,52 @@ class DoctorController extends Controller
 
     /* get all appoinment schedule of doctor*/
     public function addSchedule(Request $request){
-        $user_id    = $request->input('user_id');
-        $day_id     = $request->input('day_id');
-        $start      = $request->input('start');
-        $end        = $request->input('end');
-        
-        $time_data = array(
-            'user_id' => $user_id,
-            'day_id' => $day_id,
-            'time' => $start . '-' . $end,
-            'start' => $start,
-            'end' => $end
-        );
-        $res = DB::table('assign_time')->insert($time_data);
+        $user_id = $request->input('user_id');
+        $type    = $request->input('type');
+        $days    = $request->input('days');
 
-        if(!empty($res)){
-            return response(['status' => 1,'data' => $res]);
+        if($days){
+            $count = 1;
+            foreach ($days as $key => $schedule_times) {
+
+                $day_name = $key;
+
+                $assign_time = DB::table('assign_time')->where(function($query) use ($user_id, $day_name, $type){
+                    $query->where('user_id', $user_id);
+                    $query->where('day_name', $day_name);
+                    $query->where('type', $type);
+                })->first();
+
+                if(!empty($assign_time)){
+                    DB::table('assign_time')->where(function($query) use ($user_id, $day_name, $type){
+                        $query->where('user_id', $user_id);
+                        $query->where('day_name', $day_name);
+                        $query->where('type', $type);
+                    })->delete();
+                }
+
+                foreach($schedule_times as $value){
+                    
+                    $time_data = array(
+                        'user_id' => $user_id,
+                        'day_id' => $count,
+                        'time' => $value['start'] . '-' . $value['end'],
+                        'start' => $value['start'],
+                        'end' => $value['end'],
+                        'day_name' => $day_name,
+                        'type' => $type,
+                    );
+                    $res = DB::table('assign_time')->insert($time_data);
+                }
+
+                $count++;
+            }
+        }
+        
+        $assign_days = DB::table('assign_time')->where('user_id', $user_id)->orderBy('day_id', 'ASC')->get();        
+
+        if(!empty($assign_days)){
+            return response(['status' => 1,'data' => $assign_days]);
         }else{
             return response(['status' => 1,'data' => '']);
         }
