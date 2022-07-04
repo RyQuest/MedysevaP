@@ -7,13 +7,14 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use App\Models\Educations;
+use App\Models\UserProfile;
 
 class UserController extends Controller
 {
     /* get Doctor profile data */
     public function profile(Request $request){
         $user_id = $request->input('user_id');
-        $user = User::with(['educations', 'experiences'])->where('id',$user_id)->first();
+        $user = User::with(['educations', 'experiences', 'profile'])->where('id',$user_id)->first();
         if(!empty($user)){
             return response(['status' => 1,'data' => $user]);
         }else{
@@ -47,10 +48,25 @@ class UserController extends Controller
                 $user->image = $user_photo;
                 $user->thumb = $user_photo;
             }
+            // $res = $user->save();
 
-            $res = $user->save();
-            if($res){
-                $user = User::with(['educations', 'experiences'])->find($user_id);
+            if($res = true){
+                $user_profile = UserProfile::firstOrNew(['user_id' => $user->id]);
+                $user_profile->first_name   =   $request->input('first_name');
+                $user_profile->mid_name     =   $request->input('mid_name');
+                $user_profile->last_name    =   $request->input('last_name');
+                $user_profile->languages    =   $request->input('languages');
+                $user_profile->council      =   $request->input('council');
+                $user_profile->designation  =   $request->input('designation');
+                $user_profile->sub_speciality   =   $request->input('sub_speciality');
+                $user_profile->super_speciality =   $request->input('super_speciality');
+                $user_profile->super_interest   =   $request->input('super_interest');
+                $user_profile->pathy    =   $request->input('pathy');
+                $user_profile->state    =   $request->input('state');
+                $user_profile->tehsil   =   $request->input('tehsil');
+                $user_profile->city     =   $request->input('city');
+                $user_profile->save();
+                $user = User::with(['educations', 'experiences', 'profile'])->find($user_id);
                 return response(['status' => 1,'data' => $user]);
             }else{
                 return response(['status' => 1, 'data' => '', 'msg' => 'User updation Failed']);
