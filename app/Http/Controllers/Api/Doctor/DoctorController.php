@@ -164,13 +164,14 @@ class DoctorController extends Controller
     /* get all appoinment schedule of doctor*/
     public function schedule(Request $request){
         $user_id = $request->input('user_id');
-        $assign_days = DB::table('assign_time')->where('user_id', $user_id)->orderBy('day_id', 'ASC')->get();
-        if(!empty($assign_days)){
+        $assign_days['consultation'] = DB::table('assign_time')->where('user_id', $user_id)->where('type', 'consultation')->orderBy('day_id', 'ASC')->get();
+        $assign_days['appointments'] = DB::table('assign_time')->where('user_id', $user_id)->where('type', 'appointments')->orderBy('day_id', 'ASC')->get();
+        /*if(!empty($assign_days)){
             foreach ($assign_days as $key => $day) {
-                $assign_time = DB::table('assign_time')->where('user_id', $day->user_id)->where('day_id', $day->day)->orderBy('day_id', 'ASC')->get();
+                $assign_time = DB::table('assign_time')->where('user_id', $day->user_id)->where('type', 'consultation')->orderBy('day_id', 'ASC')->get();
                 $assign_days[$key]->assign_time = $assign_time;
             }
-        }
+        }*/
         if(!empty($assign_days)){
             return response(['status' => 1,'data' => $assign_days]);
         }else{
