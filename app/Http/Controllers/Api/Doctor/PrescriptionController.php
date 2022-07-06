@@ -349,6 +349,19 @@ class PrescriptionController extends Controller
             return response(['status' => 1,'data' => '']);
         }
     }
+
+    public function diagnosisReports(Request $request){
+        $prescription_id = $request->input('prescription_id');
+
+        $diagnosis_reports = DB::table('diagnosis_reports')
+                        ->where('prescription_id', $prescription_id)
+                        ->get();
+        if(!empty($diagnosis_reports)){
+            return response(['status' => 1,'data' => $diagnosis_reports]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
 }
 
 ?>
