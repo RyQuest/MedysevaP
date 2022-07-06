@@ -295,6 +295,19 @@ class PrescriptionController extends Controller
             return response(['status' => 1,'data' => '']);
         }
     }
+    
+    public function patientsSearch(Request $request){
+        $search_query    = $request->input('search_query');
+        
+        $patientses = DB::table('patientses')
+                        ->where('name', 'like', '%'.$search_query.'%')
+                        ->get();
+        if(!empty($patientses)){
+            return response(['status' => 1,'data' => $patientses]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
 
     
     public function addDrug(Request $request){
@@ -309,6 +322,29 @@ class PrescriptionController extends Controller
         ]);
         if(!empty($drug)){
             return response(['status' => 1,'data' => $drug]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
+    }
+
+    public function patientPrescriptions(Request $request){
+        $data = [];
+        $user_id    = $request->input('user_id');
+        $patient_id = $request->input('patient_id');
+        $offset     = $request->input('offset');
+        $limit      = $request->input('limit');
+
+        $prescriptions = Prescriptions::with(['chamber', 'patient'])
+                        ->where('user_id', $user_id)
+                        ->where('patient_id', $patient_id)
+                        ->skip($offset)
+                        ->take($limit)
+                        ->orderBy('id', 'DESC')
+                        ->get();
+
+
+        if(!empty($prescriptions)){
+            return response(['status' => 1,'data' => $prescriptions]);
         }else{
             return response(['status' => 1,'data' => '']);
         }

@@ -94,6 +94,7 @@ Route::prefix('doctor')->group(function(){
         Route::post('prescriptions', [PrescriptionController::class, 'index']);
         Route::post('prescription/view', [PrescriptionController::class, 'view']);
         Route::post('prescription/create', [PrescriptionController::class, 'create']);
+        Route::post('patient_prescriptions', [PrescriptionController::class, 'patientPrescriptions']);
 
         Route::post('diagonosis', [PrescriptionController::class, 'diagonosis']);
         /* additional advises */
@@ -108,6 +109,7 @@ Route::prefix('doctor')->group(function(){
         Route::post('drug/create', [PrescriptionController::class, 'addDrug']);
         /* patientses */
         Route::post('patientses', [PrescriptionController::class, 'patientses']);
+        Route::post('patients-search', [PrescriptionController::class, 'patientsSearch']);
 
         Route::post('dashboard',   [DashboardController::class, 'dashboard']);
 
