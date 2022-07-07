@@ -351,10 +351,10 @@ class PrescriptionController extends Controller
     }
 
     public function diagnosisReports(Request $request){
-        $prescription_id = $request->input('prescription_id');
+        $patient_id = $request->input('patient_id');
 
         $diagnosis_reports = DB::table('diagnosis_reports')
-                        ->where('prescription_id', $prescription_id)
+                        ->where('patient_id', $patient_id)
                         ->get();
         if(!empty($diagnosis_reports)){
             return response(['status' => 1,'data' => $diagnosis_reports]);
