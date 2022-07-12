@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Prescriptions;
+use App\Models\Appointment;
 use App\Models\User;
 
 class PrescriptionController extends Controller
@@ -289,7 +290,7 @@ class PrescriptionController extends Controller
             if($prescription_id != 0){
                 $app_data = array(
                     'prescription_id' => $prescription_id, 
-                    // 'patient_id' => $patient_id,
+                    'user_id' => $user_id,
                     'status' => 1
                 );
                 DB::table('appointments')->where('id', $appointment->id)->update($app_data);
@@ -473,12 +474,21 @@ class PrescriptionController extends Controller
         $offset     = $request->input('offset');
         $limit      = $request->input('limit');
         
-        $query = DB::table('patientses');
+        /*$query = DB::table('appointments');
+        $query->join('patientses', 'patientses.id', '=', 'appointments.patient_id');
+        $query->where('user_id', $user_id);
+        $query->where('is_joined', 1);
         if( $limit != 0 or is_null($limit) ){
             $query->skip($offset);
             $query->take($limit);
         }
-        $patientses = $query->get();
+        $patientses = $query->get();*/
+
+        $patientses = Appointment::with('patients')
+                        ->where('user_id', $user_id)
+                        ->where('is_joined', 1)
+                        ->orderBy('id', 'desc')
+                        ->get();
         
         if(!empty($patientses)){
             return response(['status' => 1,'data' => $patientses]);

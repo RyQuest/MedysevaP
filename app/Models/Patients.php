@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Models\Appointment;
 
 class Patients extends Authenticatable implements JWTSubject
 {
@@ -31,5 +32,9 @@ class Patients extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function appointment(){
+        return $this->belongsTo(Appointment::class, 'patient_id', 'id');
     }
 }
