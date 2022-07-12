@@ -469,7 +469,7 @@ class PrescriptionController extends Controller
         }
     }
     
-	public function patientses(Request $request){
+    public function patientses(Request $request){
         $user_id    = $request->input('user_id');
         $offset     = $request->input('offset');
         $limit      = $request->input('limit');
@@ -499,9 +499,18 @@ class PrescriptionController extends Controller
     
     public function patientsSearch(Request $request){
         $search_query    = $request->input('search_query');
+        $user_id    = $request->input('user_id');
         
-        $patientses = DB::table('patientses')
+        /*$patientses = DB::table('patientses')
                         ->where('name', 'like', '%'.$search_query.'%')
+                        ->get();*/
+        $patientses = Appointment::with('patients')
+                        ->where('user_id', $user_id)
+                        ->where('is_joined', 1)
+                        ->whereHas('patients', function($query) use($search_query) {
+                            $query->where('name', 'like', '%'.$search_query.'%');
+                        })
+                        ->orderBy('id', 'desc')
                         ->get();
         if(!empty($patientses)){
             return response(['status' => 1,'data' => $patientses]);
