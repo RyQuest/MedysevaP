@@ -47,6 +47,14 @@ class PrescriptionController extends Controller
                         ->where('id', $prescription_id)
                         ->first();
 
+        $data['pre_ad_advices'] = DB::table('pre_ad_advices')->where('prescription_id', $prescription_id)->get();
+
+        $data['pre_advice']     = DB::table('pre_advice')->where('prescription_id', $prescription_id)->get();
+
+        $data['pre_diagonosis'] = DB::table('pre_diagonosis')->where('prescription_id', $prescription_id)->get();
+
+        $data['pre_investigation'] = DB::table('pre_investigation')->where('prescription_id', $prescription_id)->get();
+
         if(!empty($prescription)){
             $data['prescription'] = $prescription;
             return response(['status' => 1,'data' => $data]);
