@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Doctor;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Str;
 use App\Models\Prescriptions;
 use App\Models\User;
 
@@ -223,11 +223,199 @@ class PrescriptionController extends Controller
 
 
     public function create(Request $request){
-        dd($request->all());
-        /*$user_id = $request->input('user_id');
-        $user_role = $request->input('user_role');*/
+        $post = $request->all();
+
+        $patient_id = $post['patient_id'];
+        $user_id = $post['user_id'];
+        $appoinment_id = $post['appoinment_id'];
+        $prescription_date  = date('Y-m-d H:i:s');
+
+
+        $appointment = DB::table('appointments')->where('id', $appoinment_id)->orderBy('id', 'desc')->first();
+
+        $data = array(
+
+            'chamber_id' => $appointment->chamber_id,
+
+            'patient_id' => $patient_id,
+
+            'appointment_id' => $appointment->id,
+            
+            't' => $post['patiant_data']['temperature'],
+
+            'p' => $post['patiant_data']['pulse_rate'],
+
+            'r' => $post['patiant_data']['respiratory_rate'],
+
+            'bp' => $post['patiant_data']['blood_pressure'],
+
+            'ht' => $post['patiant_data']['height'],
+
+            'wt' => $post['patiant_data']['weight'],
+            
+            'fbs' => $post['patiant_data']['fbs'],
+            
+            'rbs' => $post['patiant_data']['rbs'],
+            
+            'ppbs' => $post['patiant_data']['ppbs'],
+            
+            'blood_group' => $post['patiant_data']['blood_group'],
+
+            'spo2' => $post['patiant_data']['spo2'],
+
+            'chief_complains' => json_encode($post['patiant_data']['chief_complains']),
+
+            'med_histry' => json_encode($post['patiant_data']['med_histry']),
+
+            'allergies' => json_encode($post['patiant_data']['allergies']),
+
+            'past_history' => json_encode($post['patiant_data']['past_history']),
+
+            'personal_history' => json_encode($post['patiant_data']['personal_history']),
+
+            'next_visit' => $post['next_duration'].' '.$post['next_time'].' later',
+
+            'user_id' => $user_id,
+
+            'created_at' => $prescription_date,
+        );
+            
         DB::beginTransaction();
+
+        if($appointment->prescription_id == null){
+
+            $prescription_id = DB::table('prescription')->insertGetId($data);
+
+            if($prescription_id != 0){
+                $app_data = array(
+                    'prescription_id' => $prescription_id, 
+                    // 'patient_id' => $patient_id,
+                    'status' => 1
+                );
+                DB::table('appointments')->where('id', $appointment->id)->update($app_data);
+
+                // add_prescription_items
+
+                $this->add_prescription_items($prescription_id, $post);
+            }
+
+            DB::commit();
+
+            $pre_query = DB::table('prescription');
+            $pre_query->leftJoin('users', 'users.id', '=', 'prescription.user_id');
+            $pre_query->leftJoin('chamber', 'chamber.uid', '=', 'prescription.chamber_id');
+            $pre_query->where('prescription.id', $prescription_id);
+            // $pre_query->select('prescription.*, users.name as user_name, users.degree,users.reg_no,users.phone, users.specialist, users.email, chamber.name as chamber_name, chamber.logo, chamber.title as chamber_title, chamber.address');
+            $response['prescription'] = $pre_query->first();
+
+            return response(['status' => 1,'data' => $response]);
+        }else{
+            return response(['status' => 1,'data' => [], 'msg' =>'already created prescription' ]);
+        }
+
+    }
+
+    public function add_prescription_items($prescription_id, $post){
+        DB::beginTransaction();
+        // if prescription exist then delete old prescription enquiry data
+        if ($prescription_id != 0) {
+            DB::table('pre_diagonosis')->where('prescription_id', $prescription_id)->delete();
+            DB::table('pre_ad_advices')->where('prescription_id', $prescription_id)->delete();
+            DB::table('pre_advice')->where('prescription_id', $prescription_id)->delete();
+            DB::table('pre_investigation')->where('prescription_id', $prescription_id)->delete();
+            DB::table('prescription_items')->where('prescription_id', $prescription_id)->delete();
+        }
+
+        // Insert diagonosis data
+        if(!empty($post['diagonosis'])):
+            $i=0;
+            foreach ($post['diagonosis'] as $value_1) {
+                $data_1 = array(
+                    'prescription_id' => $prescription_id,
+                    'diagonosis_id' => $value_1,
+                );
+                $i++; 
+                DB::table('pre_diagonosis')->insert($data_1);
+            }
+        endif; 
+
+        // Insert ad_advices data
+        if(!empty($post['ad_advices'])):
+            $j=0;
+            foreach ($post['ad_advices'] as $value_2) {
+                $data_2 = array(
+                    'prescription_id' => $prescription_id,
+                    'ad_advices_id' => $value_2,
+                );
+                $j++; 
+                DB::table('pre_ad_advices')->insert($data_2);
+            }
+        endif;
+
+        // Insert advices data
+        if(!empty($post['ad_advices'])):
+            $k=0;
+            foreach ($post['ad_advices'] as $value_3) {
+                $data_3 = array(
+                    'prescription_id' => $prescription_id,
+                    'advice_id' => $value_3,
+                );
+                $k++;
+                DB::table('pre_advice')->insert($data_3);
+            }
+        endif;        
+
+        // Insert investigation data
+        if(!empty($post['investigation'])):
+            $l=0;
+            $invoiceId = random_int(10000, 99999);
+            $final_total = array();
+            
+            $appoinment_id =  $post['appoinment_id'];
+            $app_data = DB::table('appointments')->where('id', $appoinment_id)->get();
+             
+            foreach ($post['investigation'] as $value_4) {
+
+                $data_4 = array(
+                    'prescription_id' => $prescription_id,
+                    'investigation_id' => $value_4,
+                );
+                $l++;
+
+                DB::table('pre_investigation')->insert($data_4);
+            }
+        endif;
+
+        
+        // add drugs data
+        $prescription_info = DB::table('prescription')->where('id', $prescription_id)->first();
+
+        foreach ($post['drugs'] as $key => $drug) {
+
+            $data = array(
+                'prescription_id'=>$prescription_id,
+                'drug_id'       =>$drug['drug_id'],
+                'doctor_id'     =>  $prescription_info->user_id,
+                'patient_id'    =>  $prescription_info->patient_id,   
+                'time_periods'  => !empty($drug['time_period']) ? $drug['time_period'] : '',
+                'medicine_time' => !empty($drug['medicine_time']) ? $drug['medicine_time'] : '',
+                'duration_text' =>!empty($drug['duration_text']) ? $drug['duration_text'] : '',
+                'duration'  => !empty($drug['duration']) ? $drug['duration'] : '',
+                'note'      => !empty($drug['note']) ? $drug['note'] : '',
+                'created_at' => date('Y-m-d H:i:s'),
+            );
+            
+            if(!empty($drug['time_periods']) || !empty($drug['medicine_time']) || !empty($drug['duration_text'])
+
+             || !empty($drug['duration']) || !empty($drug['note'])):
+
+                DB::table('prescription_items')->insert($data);
+            endif;
+        }
+
         DB::commit();
+
+        return true;
     }
     
     public function diagonosis(Request $request){
@@ -285,10 +473,13 @@ class PrescriptionController extends Controller
         $offset     = $request->input('offset');
         $limit      = $request->input('limit');
         
-        $patientses = DB::table('patientses')
-                        ->skip($offset)
-                        ->take($limit)
-                        ->get();
+        $query = DB::table('patientses');
+        if( $limit != 0 or is_null($limit) ){
+            $query->skip($offset);
+            $query->take($limit);
+        }
+        $patientses = $query->get();
+        
         if(!empty($patientses)){
             return response(['status' => 1,'data' => $patientses]);
         }else{

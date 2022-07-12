@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Doctor;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 use App\Models\User;
 
@@ -29,6 +30,8 @@ class DashboardController extends Controller
         $data['todays_patients']              = DB::table('appointments')->where('date', date('Y-m-d'))->where('user_id',$user_id)->count();
         $data['missed_patients']            = DB::table('appointments')->where('date', '<', date('Y-m-d'))->where('user_id',$user_id)->where('status', 0)->count();
         $data['wallet'] = DB::table('user_wallet')->where('user_id', $user_id)->pluck('amount');
+        // SELECT SUM(amount) FROM clinic.trx_history where user_id = 60 AND category = 'appointment_referral';
+        $data['total_consultation_fees'] = DB::table('trx_history')->where('user_id', $user_id)->where('category', 'appointment_referral')->sum('amount');
 
         $dr_query = DB::table('appointments');
         if($user->chamber_id > 0)        {
@@ -51,6 +54,14 @@ class DashboardController extends Controller
         }else{
             return response(['status' => 1,'data' => '']);
         }
+    }
+
+    public function dashboardGraph(Request $request){
+        $user_id     = $request->input('user_id');
+        $chamber_uid = $request->input('chamber_uid');
+        $current = Carbon::now()->toDateString();
+        dd($current);
+        dd(Carbon::now()->subDays(30)->toDateString());
     }
 }
 
