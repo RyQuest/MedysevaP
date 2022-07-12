@@ -468,7 +468,7 @@ class PrescriptionController extends Controller
         }
     }
     
-    public function patientses(Request $request){
+	public function patientses(Request $request){
         $user_id    = $request->input('user_id');
         $offset     = $request->input('offset');
         $limit      = $request->input('limit');
