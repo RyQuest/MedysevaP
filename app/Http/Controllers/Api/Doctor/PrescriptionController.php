@@ -324,6 +324,59 @@ class PrescriptionController extends Controller
 
     }
 
+    public function update(Request $request){
+        $post = $request->all();
+
+        $prescription_id = $post['prescription_id'];
+        $patient_id = $post['patient_id'];
+        $user_id = $post['user_id'];
+        $appoinment_id = $post['appoinment_id'];
+
+
+        $prescription = DB::table('prescription')->where('id', $prescription_id)->first();
+
+        if(!empty($prescription)){
+            $data = array(
+                't' => $post['patiant_data']['temperature'],
+                'p' => $post['patiant_data']['pulse_rate'],
+                'r' => $post['patiant_data']['respiratory_rate'],
+                'bp' => $post['patiant_data']['blood_pressure'],
+                'ht' => $post['patiant_data']['height'],
+                'wt' => $post['patiant_data']['weight'],
+                'fbs' => $post['patiant_data']['fbs'],
+                'rbs' => $post['patiant_data']['rbs'],
+                'ppbs' => $post['patiant_data']['ppbs'],
+                'blood_group' => $post['patiant_data']['blood_group'],
+                'spo2' => $post['patiant_data']['spo2'],
+                'chief_complains' => json_encode($post['patiant_data']['chief_complains']),
+                'med_histry' => json_encode($post['patiant_data']['med_histry']),
+                'allergies' => json_encode($post['patiant_data']['allergies']),
+                'past_history' => json_encode($post['patiant_data']['past_history']),
+                'personal_history' => json_encode($post['patiant_data']['personal_history']),
+                'next_visit' => $post['next_duration'].' '.$post['next_time'].' later',
+            );
+            
+            DB::beginTransaction();
+            DB::table('prescription')->where('id', $prescription_id)->update($data);
+
+            $this->add_prescription_items($prescription_id, $post);
+
+            DB::commit();
+
+            $pre_query = DB::table('prescription');
+            $pre_query->leftJoin('users', 'users.id', '=', 'prescription.user_id');
+            $pre_query->leftJoin('chamber', 'chamber.uid', '=', 'prescription.chamber_id');
+            $pre_query->where('prescription.id', $prescription_id);
+            // $pre_query->select('prescription.*, users.name as user_name, users.degree,users.reg_no,users.phone, users.specialist, users.email, chamber.name as chamber_name, chamber.logo, chamber.title as chamber_title, chamber.address');
+            $response['prescription'] = $pre_query->first();
+
+            return response(['status' => 1,'data' => $response]);
+
+        }else{
+            return response(['status' => 1,'data' => [], 'msg' =>'prescription not found' ]);
+        }
+    }
+
     public function add_prescription_items($prescription_id, $post){
         DB::beginTransaction();
         // if prescription exist then delete old prescription enquiry data

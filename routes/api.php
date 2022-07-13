@@ -94,6 +94,7 @@ Route::prefix('doctor')->group(function(){
         Route::post('prescriptions', [PrescriptionController::class, 'index']);
         Route::post('prescription/view', [PrescriptionController::class, 'view']);
         Route::post('prescription/create', [PrescriptionController::class, 'create']);
+        Route::post('prescription/update', [PrescriptionController::class, 'update']);
         Route::post('patient_prescriptions', [PrescriptionController::class, 'patientPrescriptions']);
         Route::post('prescription/diagnosis_reports', [PrescriptionController::class, 'diagnosisReports']);
 
