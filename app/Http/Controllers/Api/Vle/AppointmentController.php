@@ -348,7 +348,7 @@ class AppointmentController extends Controller
         ->skip($offset)
         ->get();*/
 
-        $appointment = Appointment::with(['patient', 'chamber', 'doctor'])
+        $appointment = Appointment::with(['patient', 'chamber', 'doctor', 'payment_user'])
                         ->where('added_by', $vle_id)
                         ->where('added_by_role', 'vle')
                         ->take($limit)

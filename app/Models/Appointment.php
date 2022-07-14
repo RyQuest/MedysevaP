@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Patients;
 use App\Models\Chamber;
 use App\Models\User;
+use App\Models\PaymentUser;
 
 class Appointment extends Model
 {
@@ -28,5 +29,9 @@ class Appointment extends Model
 
     public function doctor(){
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function payment_user(){
+        return $this->hasOne(PaymentUser::class, 'appointment_id', 'id');
     }
 }
