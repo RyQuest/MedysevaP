@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Vle;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use App\Models\Appointment;
 use App\Models\Chamber;
 use App\Models\Patients;
@@ -28,42 +29,59 @@ class AppointmentController extends Controller
 
     public function create(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'consultation_type' => 'required',
-            'date' => 'required',
-            'patient_type' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return response(['status' => 0, 'msg' => $validator->errors()->first()]);
-        }
-        if ($request->get('patient_type') == "1") {
+        $vle_id = $request->input('vle_id');
+        $patient_data = $request->input('patient_data');
+
+        /* Validation start */
             $validator = \Validator::make($request->all(), [
-                'name' => 'required',
-                'mobile' => 'required',
-                'age' => 'required',
+                'consultation_type' => 'required',
+                'date' => 'required',
+                'patient_type' => 'required',
             ]);
             if ($validator->fails()) {
                 return response(['status' => 0, 'msg' => $validator->errors()->first()]);
             }
-        } else{
-            $validator = \Validator::make($request->all(), [
-                'patient_id' => 'required',
-            ]);
-            if ($validator->fails()) {
-                return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+            if ($request->get('patient_type') == "1") {
+                $validator = \Validator::make($request->all(), [
+                    'name' => 'required',
+                    'email' => 'required',
+                    'mobile' => 'required',
+                    'age' => 'required',
+                ]);
+                if ($validator->fails()) {
+                    return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+                }
+            } else{
+                $validator = \Validator::make($request->all(), [
+                    'patient_id' => 'required',
+                ]);
+                if ($validator->fails()) {
+                    return response(['status' => 0, 'msg' => $validator->errors()->first()]);
+                }
             }
-        }
-        $user = JWTAuth::parseToken()->authenticate($request->get('token'));
-        $userAalletAmount = UserWallet::where('user_id',$user->id)->where('user_role','vle')->first();
-        $consultation_fee = 0;
-        if ($request->get('consultation_type') == "1") {
-            $consultation_fee = 150;
-        } else {
-            $consultation_fee = 500;
-        }
-        if ($consultation_fee > $userAalletAmount->amount) {
-            return response(['status' => 0, 'msg' => 'Insufficient wallet amount']);
-        }
+            // $user = JWTAuth::parseToken()->authenticate($request->get('token'));
+            $user = VleUser::find($vle_id);
+            if(empty($user)){
+                return response(['status' => 0, 'msg' => 'VLE not found']);
+            }
+
+            // vle user Wallet before Appoinment 
+            $vleUserWallet = UserWallet::where('user_id',$user->id)->where('user_role','vle')->first();
+
+            $consultation_fee = 0;
+            if ($request->get('consultation_type') == "1") {
+                $consultation_fee = 150;
+            } else {
+                $consultation_fee = 500;
+            }
+            if ($consultation_fee > $vleUserWallet->amount) {
+                return response(['status' => 0, 'msg' => 'Insufficient wallet amount']);
+            }
+        /* validation end */
+        
+        DB::beginTransaction();
+
+        // Create patient if patient_type is 1.
         $patient = null;
         if ($request->get('patient_type') == "1") {
             $patient = Patients::create([
@@ -93,7 +111,8 @@ class AppointmentController extends Controller
 
                 'present_address' => $request->get('present_address'),
 
-                'password' => bcrypt(rand(1111, 9999)),
+                'password' => bcrypt('123456'),
+                // 'password' => bcrypt(rand(1111, 9999)),
 
                 'created_at' => date('Y-m-d H:i:s'),
 
@@ -114,64 +133,136 @@ class AppointmentController extends Controller
         }
         $appointment = Appointment::create([
             'chamber_id' => $chamber->uid,
-            'user_id' => 0,
+            'user_id'    => 0,
             'patient_id' => $patient->id,
-            'camp_type' => "",
-            'camp_name' => '',
-
-            'serial_id' => 0,
-
-            'date' => $request->get('date'),
-
-            'time' => $request->get('time'),
-
-            'status' => 0,
-
-            'type' => $request->get('cons_type'),
-
-            't' => $request->get('t'),
-
-            'p' => $request->get('p'),
-
-            'r' => $request->get('r'),
-
-            'bp' => $request->get('bp'),
-
-            'ht' => $request->get('ht'),
-
-            'wt' => $request->get('wt'),
-
-            'spo2' => $request->get('spo2'),
-
-            'chief_complains' => $request->get('chief_complains'),
-            'consultations_type'  => "",//$request->get('payment_mode'),
-            'follow_up' => $request->get('follow_up'),
+            'date'       => $request->get('date'),
+            'time'       => $request->get('time'),
+            'type'       => $request->get('cons_type'),
+            'serial_id'  => 0,
+            'status'     => 0,
             'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+
+            't' => $patient_data['temperature'],
+            'p' => $patient_data['pulse_rate'],
+            'r' => $patient_data['respiratory_rate'],
+            'bp' => $patient_data['blood_pressure'],
+            'ht' => $patient_data['height'],
+            'wt' => $patient_data['weight'],
+            'spo2' => $patient_data['spo2'],
+            'fbs' => $patient_data['fbs'],
+            'rbs' => $patient_data['rbs'],
+            'ppbs' => $patient_data['ppbs'],
+            'blood_group' => $patient_data['blood_group'],
+            'follow_up' => $patient_data['follow_up_patient'],
             'added_by' => $user->id,
             'added_by_role' => 'vle',
-            'fbs' => $request->get('fbs'),
-            'rbs' => $request->get('rbs'),
-            'ppbs' => $request->get('ppbs'),
-            'blood_group' => $request->get('blood_group'),
             'appointment_type' => $request->get('consultation_type')
         ]);
 
+        // check consultation type is general else special
         if ($request->get('consultation_type') == "1") {
             $service_fee = 150;
-            $vle_ref = 19;
+            /*$vle_ref = 19;
             $partner_ref = 9.50;
-            $medy_sewa_ref = 121.50;
+            $medy_sewa_ref = 121.50;*/
+            $vle_ref = 20;
+            $partner_ref = 10;
+            $medy_sewa_ref = 119;
+
         } else {
             $service_fee = 500;
-            $vle_ref = 57;
+            /*$vle_ref = 57;
             $partner_ref = 28.50;
-            $medy_sewa_ref = 414.50;
+            $medy_sewa_ref = 414.50;*/
+            $vle_ref = 60;
+            $partner_ref = 30;
+            $medy_sewa_ref = 410;
         }
+        
+        $trx_id = uniqid();
 
-        $vleTds = ($vle_ref * 5) / 100;
+        // $loginUserAmt = $vleUserWallet->amount;
+        // Vle user wallet amount after service deduct
+        $vleUserWalletAmt = floatval($vleUserWallet->amount) - floatval($service_fee);
 
+        // admin wallet obj
+        $adminwallet = UserWallet::find(4);
+        $adminWalletAmt = floatval($adminwallet->amount)+floatval($service_fee) ; // Admin Wallet Amount after service fees added
+        
+        // Service fees transaction from VLE to Admin
+        TrHistory::create([
+            'user_id' => $user->id,
+            'trx_id' => $trx_id,
+            'user_role' =>  'vle',
+            'wallet_id' => $vleUserWallet->id,
+            'from_wallet' => $vleUserWallet->id,
+            'to_wallet' => 4,
+            'category' => 'appointment',
+            'appointment_id' => $appointment->id,
+            'amount' => $service_fee,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+            'current_amount' => $vleUserWalletAmt,
+            'receiver_amount' => $adminWalletAmt,
+            'patient_id' => $patient->id
+        ]);
+
+
+        // Admin wallet amount after deduct vle reference
+        $adminWalletAmt     = floatval($adminWalletAmt) - floatval($vle_ref);
+        // Vle user wallet amount after add vle reference
+        $vleUserWalletAmt   = floatval($vleUserWalletAmt) + floatval($vle_ref);
+
+        // VLE reference transaction from Admin to VLE
+        TrHistory::create([
+            'user_id' => $user->id,
+            'trx_id' => $trx_id,
+            'user_role' =>  'vle',
+            'wallet_id' => $vleUserWallet->id,
+            'from_wallet' => 4,
+            'to_wallet' => $vleUserWallet->id,
+            'category' => 'appointment_referral',
+            'appointment_id' => $appointment->id,
+            'amount' => $vle_ref,
+            'vle_referral' => $vle_ref,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+            'current_amount' => $adminWalletAmt,
+            'receiver_amount' => $vleUserWalletAmt,
+            'patient_id' => $patient->id
+        ]);        
+
+        // calculate VLE TDS
+        $vleTds   = ($vle_ref * 5) / 100;
+        $medy_sewa_ref = $medy_sewa_ref + $vleTds;
+        
+        // Admin wallet amount after added vle tds
+        $adminWalletAmt = $adminWalletAmt + $vleTds;
+        // VLE user wallet amount after deducted vle tds
+        $vleUserWalletAmt = $vleUserWalletAmt - $vleTds;
+
+        // VLE TDS transaction from VLE to Admin
+        TrHistory::create([
+            'user_id' => 1,
+            'user_role' =>  'admin',
+            'trx_id' => $trx_id,
+            'wallet_id' => 4,
+            'from_wallet' => $vleUserWallet->id,
+            'to_wallet' => 4,
+            'category' => 'tds',
+            'appointment_id' => $appointment->id,
+            'amount' => $vleTds,
+            'medyseva_referral' => $medy_sewa_ref,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+            'current_amount' => $vleUserWalletAmt,
+            'receiver_amount' => $adminWalletAmt,
+            'patient_id' => $patient->id
+        ]);
+
+        // calculate Partner TDS
         $partnerTds = 0;
-
         if ($user->added_by_role == "partner") {
             $partnerTds = ($partner_ref * 5) / 100;
             $medy_sewa_ref = $medy_sewa_ref + $partnerTds;
@@ -179,93 +270,16 @@ class AppointmentController extends Controller
             $partner_ref = 0;
         }
 
-        $trx_id = uniqid();
-
-        $medy_sewa_ref = $medy_sewa_ref + $vleTds;
-
-        $loginUserAmt = $userAalletAmount->amount;
-        $loginUserAmt = $loginUserAmt - $service_fee;
-
-        // admin wallet
-        $adminwallet = UserWallet::find(4);
-        $adminNewAmount = $adminwallet->amount + $service_fee;
-
-        TrHistory::create([
-            'user_id' => $user->id,
-            'trx_id' => $trx_id,
-            'user_role' =>  'vle',
-            'wallet_id' => $userAalletAmount->id,
-            'from_wallet' => $userAalletAmount->id,
-            'to_wallet' => 4,
-            'category' => 'appointment',
-            'appointment_id' => $appointment->id,
-            'amount' => $service_fee,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-            'current_amount' => $loginUserAmt,
-            'receiver_amount' => $adminNewAmount,
-            'patient_id' => $patient->id
-        ]);
-
-        // add vle ref
-        $adminNewAmount = $adminNewAmount - $vle_ref;
-        $loginUserAmt = $loginUserAmt + $vle_ref;
-        TrHistory::create([
-            'user_id' => $user->id,
-            'user_role' =>  'vle',
-            'trx_id' => $trx_id,
-            'wallet_id' => $userAalletAmount->id,
-            'from_wallet' => 4,
-            'to_wallet' => $userAalletAmount->id,
-            'category' => 'appointment_referral',
-            'appointment_id' => $appointment->id,
-            'amount' => $vle_ref,
-            'doctor_fee' => 0,
-            'junior_doctor_fee' => 0,
-            'vle_referral' => $vle_ref,
-            'partner_referral' => 0,
-            'medyseva_referral' => $medy_sewa_ref,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-            'current_amount' => $adminNewAmount,
-            'receiver_amount' => $loginUserAmt,
-            'patient_id' => $patient->id
-        ]);
-
-        // add tds
-        $adminNewAmount = $adminNewAmount + $vleTds;
-        $loginUserAmt = $loginUserAmt - $vleTds;
-
-        TrHistory::create([
-            'user_id' => 1,
-            'user_role' =>  'admin',
-            'trx_id' => $trx_id,
-            'wallet_id' => 4,
-            'from_wallet' => $userAalletAmount->id,
-            'to_wallet' => 4,
-            'category' => 'tds',
-            'appointment_id' => $appointment->id,
-            'amount' => $vleTds,
-            'doctor_fee' => 0,
-            'junior_doctor_fee' => 0,
-            'vle_referral' => $vle_ref,
-            'partner_referral' => 0,
-            'medyseva_referral' => $medy_sewa_ref,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-            'current_amount' => $loginUserAmt,
-            'receiver_amount' => $adminNewAmount,
-            'patient_id' => $patient->id
-        ]);
 
         // partner ref
-        if ($partner_ref > 0) {
+        if ($user->added_by_role == "partner") {
             $partnerWallet = UserWallet::find(5);
             $partnerUserWallet = $partnerWallet->amount;
 
-            $adminNewAmount = $adminNewAmount - $partner_ref;
+            $adminWalletAmt = $adminWalletAmt - $partner_ref;
             $partnerUserWallet = $partnerUserWallet + $partner_ref;
 
+            // Partner refernce transaction from Admin to partner
             TrHistory::create([
                 'user_id' => 96,
                 'trx_id' => $trx_id,
@@ -276,21 +290,17 @@ class AppointmentController extends Controller
                 'category' => 'appointment_referral',
                 'appointment_id' => $appointment->id,
                 'amount' => $partner_ref,
-                'doctor_fee' => 0,
-                'junior_doctor_fee' => 0,
-                'vle_referral' => $vle_ref,
-                'partner_referral' => 0,
                 'medyseva_referral' => $medy_sewa_ref,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-                'current_amount' => $adminNewAmount,
+                'current_amount' => $adminWalletAmt,
                 'receiver_amount' => $partnerUserWallet,
                 'patient_id' => $patient->id
             ]);
 
-            // add tds
-            $adminNewAmount = $adminNewAmount + $partnerTds;
-
+            // add Partner TDS to Admin wallet
+            $adminWalletAmt = $adminWalletAmt + $partnerTds;
+            // deduct Partner TDS from patner wallet
             $partnerUserWallet = $partnerUserWallet - $partnerTds;
 
             TrHistory::create([
@@ -303,15 +313,11 @@ class AppointmentController extends Controller
                 'category' => 'tds',
                 'appointment_id' => $appointment->id,
                 'amount' => $partnerTds,
-                'doctor_fee' => 0,
-                'junior_doctor_fee' => 0,
-                'vle_referral' => $vle_ref,
-                'partner_referral' => 0,
                 'medyseva_referral' => $medy_sewa_ref,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
                 'current_amount' => $partnerUserWallet,
-                'receiver_amount' => $adminNewAmount,
+                'receiver_amount' => $adminWalletAmt,
                 'patient_id' => $patient->id
             ]);
 
@@ -320,8 +326,10 @@ class AppointmentController extends Controller
         }
 
         // update user wallet
-        UserWallet::where('id', 4)->update(['amount' => $adminNewAmount]);
-        UserWallet::where('id', $userAalletAmount->id)->update(['amount'=> $loginUserAmt]);
+        UserWallet::where('id', 4)->update(['amount' => $adminWalletAmt]);
+        UserWallet::where('id', $vleUserWallet->id)->update(['amount'=> $vleUserWalletAmt]);
+
+        DB::commit();
 
         return response(['status' => 1, 'msg' => 'Appointment created successfully']);
     }
