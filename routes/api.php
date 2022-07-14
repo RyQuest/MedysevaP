@@ -177,6 +177,11 @@ Route::prefix('nict')->group(function () {
 
 Route::prefix('vle')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
+
+    /* patientses */
+    Route::post('patientses', 'Api\Vle\MainController@patientses');
+    Route::post('patients-search', 'Api\Vle\MainController@patientsSearch');
+
     Route::prefix('appointment')->group(function () {
         Route::post('/', [AppointmentController::class, 'index']);
         Route::post('create', [AppointmentController::class, 'create']);
