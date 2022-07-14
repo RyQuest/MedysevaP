@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Educations;
 use App\Models\UserProfile;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -44,11 +45,13 @@ class UserController extends Controller
             $user->enable_appointment = $request->input('enable_appointment');
 
             if($request->hasFile('photo')){
-                $user_photo = $request->file('photo')->store('users','public');
+                // $user_photo = $request->file('photo')->store('users','public');
+                $path = Storage::putFile('public/users/profile', $request->file('photo'));
+                $user_photo = url($path);
                 $user->image = $user_photo;
                 $user->thumb = $user_photo;
             }
-            // $res = $user->save();
+            $res = $user->save();
 
             if($res = true){
                 $user_profile = UserProfile::firstOrNew(['user_id' => $user->id]);
@@ -65,6 +68,8 @@ class UserController extends Controller
                 $user_profile->state    =   $request->input('state');
                 $user_profile->tehsil   =   $request->input('tehsil');
                 $user_profile->city     =   $request->input('city');
+                $user_profile->country     =   $request->input('country');
+                $user_profile->website     =   $request->input('website');
                 $user_profile->save();
                 $user = User::with(['educations', 'experiences', 'profile'])->find($user_id);
                 return response(['status' => 1,'data' => $user]);

@@ -328,8 +328,16 @@ class AppointmentController extends Controller
 
     public function index(Request $request)
     {
+        $vle_id = $request->input('vle_id');
+        $limit = $request->input('limit');
+        $offset = $request->input('offset');
+
         $appointment = Appointment::select('appointments.*','patientses.name')
         ->join('patientses','patientses.id','=','appointments.patient_id')
+        ->where('appointments.added_by', $vle_id)
+        ->where('appointments.added_by_role', 'vle')
+        ->take($limit)
+        ->skip($offset)
         ->get();
 
         return response(['status' => 1,'data' => $appointment]);
