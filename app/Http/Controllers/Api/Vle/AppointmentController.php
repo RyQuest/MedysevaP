@@ -340,13 +340,21 @@ class AppointmentController extends Controller
         $limit = $request->input('limit');
         $offset = $request->input('offset');
 
-        $appointment = Appointment::select('appointments.*','patientses.name')
+        /*$appointment = Appointment::select('appointments.*','patientses.name')
         ->join('patientses','patientses.id','=','appointments.patient_id')
         ->where('appointments.added_by', $vle_id)
         ->where('appointments.added_by_role', 'vle')
         ->take($limit)
         ->skip($offset)
-        ->get();
+        ->get();*/
+
+        $appointment = Appointment::with(['patient', 'chamber', 'doctor'])
+                        ->where('added_by', $vle_id)
+                        ->where('added_by_role', 'vle')
+                        ->take($limit)
+                        ->skip($offset)
+                        ->orderBy('id', 'desc')
+                        ->get();
 
         return response(['status' => 1,'data' => $appointment]);
     }
