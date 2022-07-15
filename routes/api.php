@@ -115,6 +115,7 @@ Route::prefix('doctor')->group(function(){
 
         Route::post('dashboard',   [DashboardController::class, 'dashboard']);
         Route::post('dashboard/graph',   [DashboardController::class, 'dashboardGraph']);
+        Route::post('dashboard/graph/patient',   [DashboardController::class, 'dashboardGraphPatient']);
 
         Route::post('appointments',   [DoctorController::class, 'appointments']);
 
