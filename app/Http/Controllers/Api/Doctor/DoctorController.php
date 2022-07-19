@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Doctor;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
+use Carbon\Carbon;
 use App\Models\User;
 
 class DoctorController extends Controller
@@ -338,6 +338,7 @@ class DoctorController extends Controller
                     'link' => $appoint->video_link
                 );
 
+                $now = Carbon::now();
                 $array = array('user_id' => $user->id, 'is_joined' => 1, 'status' => 1);
                 DB::table('appointments')->where('id', $appointment_id)->update($array);
 

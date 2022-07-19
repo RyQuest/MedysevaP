@@ -72,17 +72,17 @@ class PatientController extends Controller
             $params['medHistory'] = false;
 
             // \Log::info($params);
-            $client = new \GuzzleHttp\Client();
+            /*$client = new \GuzzleHttp\Client();
             $call = "https://dev-main.abhayparimitii.cloudns.asia/auth/user/register";
             $request = $client->post($call, [
                 //  'headers' => ['Content-Type' => 'application/json'],
                 'json' => $params
-            ]);
-            $response =  json_decode($request->getBody()->getContents(), true);
+            ]);*/
+            /*$response =  json_decode($request->getBody()->getContents(), true);
             if ($response['success']) {
                 return response(['status' => 1, 'msg' => $response]);
-            }
-            return response(['status' => 0, 'msg' => '']);
+            }*/
+            return response(['status' => 1, 'msg' => 'success']);
         } catch (\Exception $ex) {
             return response(['status' => 0, 'msg' => $ex->getMessage()]);
         }
@@ -91,12 +91,12 @@ class PatientController extends Controller
     public function gettotalscansfrommobile($mobile)
     {
         try {
-            $client = new \GuzzleHttp\Client();
+            /*$client = new \GuzzleHttp\Client();
             $call = "https://dev-main.abhayparimitii.cloudns.asia/user/gettotalscansfrommobile/" . $mobile;
             $request = $client->get($call);
-            $response =  json_decode($request->getBody()->getContents(), true);
+            $response =  json_decode($request->getBody()->getContents(), true);*/
 
-            return response(['status' => 1, 'msg' => $response]);
+            return response(['status' => 1, 'msg' => '']);
         } catch (\Exception $ex) {
             return response(['status' => 0, 'msg' => $ex->getMessage()]);
         }
@@ -107,12 +107,12 @@ class PatientController extends Controller
         try {
             // \Log::info($scan_id);
             // \Log::info($cid);
-            $client = new \GuzzleHttp\Client();
+            /*$client = new \GuzzleHttp\Client();
             $call = "https://dev-main.abhayparimitii.cloudns.asia/userdata/gethealthframefromscanidandCID/" . $scan_id . "/" . $cid;
             $request = $client->get($call);
-            $response =  json_decode($request->getBody()->getContents(), true);
+            $response =  json_decode($request->getBody()->getContents(), true);*/
 
-            return response(['status' => 1, 'data' => $response]);
+            return response(['status' => 1, 'data' => '']);
         } catch (\Exception $ex) {
             return response(['status' => 0, 'msg' => $ex->getMessage()]);
         }

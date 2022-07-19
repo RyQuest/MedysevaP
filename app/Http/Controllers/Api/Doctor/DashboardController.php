@@ -146,9 +146,51 @@ class DashboardController extends Controller
             }
         /* End */
 
+        /* consultation fees hourly */
+        /* DR. patient count hourly */
+        $patient_hourly = [
+            "0" => ["00:00", "00:59"],
+            "1" => ["01:00", "01:59"],
+            "2" => ["02:00", "02:59"],
+            "3" => ["03:00", "03:59"],
+            "4" => ["04:00", "04:59"],
+            "5" => ["05:00", "05:59"],
+            "6" => ["06:00", "06:59"],
+            "7" => ["07:00", "07:59"],
+            "8" => ["08:00", "08:59"],
+            "9" => ["09:00", "09:59"],
+            "10" => ["10:00", "10:59"],
+            "11" => ["11:00", "11:59"],
+            "12" => ["12:00", "12:59"],
+            "13" => ["13:00", "13:59"],
+            "14" => ["14:00", "14:59"],
+            "15" => ["15:00", "15:59"],
+            "16" => ["16:00", "16:59"],
+            "17" => ["17:00", "17:59"],
+            "18" => ["18:00", "18:59"],
+            "19" => ["19:00", "19:59"],
+            "20" => ["20:00", "20:59"],
+            "21" => ["21:00", "21:59"],
+            "22" => ["22:00", "22:59"],
+            "23" => ["23:00", "23:59"],
+        ];
+
+        $adata = [];
+
+        foreach($patient_hourly as $key => $value){
+            $hrow = [];
+            $hrow['time_interval'] = $value[0].'-'.$value[1];
+            $query = "SELECT SUM(trx.amount) as `total_amount` FROM appointments as app INNER JOIN trx_history as trx ON app.id = trx.appointment_id where app.user_id = ".$user_id." AND app.is_joined = 1 AND trx.user_role = 'user' AND DATE_FORMAT(app.updated_at,'%H:%i') BETWEEN '".$value[0]."' AND '".$value[1]."'; ";
+            $hrow['total_amount'] = DB::select($query);
+            $adata[] = $hrow;
+        }        
+        /* End */        
+        /* End */
+
         $main_data = [
             'monthly_data' => $monthly_data,
             'week_data' => $week_data,
+            'hourly_data' => $adata,
         ];
 
         return response(['status' => 1,'data' => $main_data]);
@@ -231,12 +273,130 @@ class DashboardController extends Controller
             }
         /* End */
 
+        /* DR. patient count hourly */
+        $patient_hourly = [
+            "0" => ["00:00", "00:59"],
+            "1" => ["01:00", "01:59"],
+            "2" => ["02:00", "02:59"],
+            "3" => ["03:00", "03:59"],
+            "4" => ["04:00", "04:59"],
+            "5" => ["05:00", "05:59"],
+            "6" => ["06:00", "06:59"],
+            "7" => ["07:00", "07:59"],
+            "8" => ["08:00", "08:59"],
+            "9" => ["09:00", "09:59"],
+            "10" => ["10:00", "10:59"],
+            "11" => ["11:00", "11:59"],
+            "12" => ["12:00", "12:59"],
+            "13" => ["13:00", "13:59"],
+            "14" => ["14:00", "14:59"],
+            "15" => ["15:00", "15:59"],
+            "16" => ["16:00", "16:59"],
+            "17" => ["17:00", "17:59"],
+            "18" => ["18:00", "18:59"],
+            "19" => ["19:00", "19:59"],
+            "20" => ["20:00", "20:59"],
+            "21" => ["21:00", "21:59"],
+            "22" => ["22:00", "22:59"],
+            "23" => ["23:00", "23:59"],
+        ];
+
+        $adata = [];
+
+        foreach($patient_hourly as $key => $value){
+            $hrow = [];
+            $hrow['time_interval'] = $value[0].'-'.$value[1];
+            $query = "SELECT count(date) as `total_patient` FROM appointments as app where app.user_id = ".$user_id." AND app.is_joined = 1 AND DATE_FORMAT(updated_at,'%H:%i') BETWEEN '".$value[0]."' AND '".$value[1]."'; ";
+            $hrow['total_patient'] = DB::select($query);
+            $adata[] = $hrow;
+        }        
+        /* End */
+
         $main_data = [
             'monthly_data' => $monthly_data,
             'week_data' => $week_data,
+            'hourly_data' => $adata,
         ];
 
         return response(['status' => 1,'data' => $main_data]);
+    }
+
+    public function dashboardGraphPatientHourly(Request $request){
+        $month_begin = Carbon::now()->subDays(30)->toDateString();
+        $month_end = Carbon::now()->toDateString();
+        $user_id     = $request->input('user_id');
+        $chamber_uid = $request->input('chamber_uid');
+        $monthly_data = [];
+        $week_data = [];
+        $consult_fees_array = [];
+        $consult_trx_dates = [];
+        
+        // $appointments = DB::table('appointments')->where('added_by', '!=', 1)->where('user_id', $user_id)->select('id', 'created_at', 'updated_at', 'joined_time')->get();
+
+        /*foreach ($appointments as $key => $app) {
+            $dt = Carbon::create($app->updated_at);
+            $dt_time = $dt->format('H:i');
+        }*/
+
+        /*$updatedDateTimeList = array();
+        $startdate = date("Y-m-d H:i:s",strtotime ("2022-07-18 00:00:00"));
+        $enddate = date("Y-m-d H:i:s",strtotime ("2022-07-18 23:59:59"));
+        $updatedDateTimeList[] = date("H", strtotime($startdate)); //store the first value
+        while ($startdate < $enddate)
+        {
+          $startdate = strtotime($startdate)+3600; //add one hour to $startdate
+          $startdate = date("Y-m-d H:i:s", $startdate); 
+          $updatedDateTimeList[] = date("H", strtotime($startdate)); // store to the array
+        }*/
+        /*for ($i=0; $i < count($updatedDateTimeList); $i++) {
+            for ($j=$i; $j <$i+2; $j++) { 
+                $row = [];
+                $row[0] = $updatedDateTimeList[$i];
+                if($i != 24){
+                    $row[1] = $updatedDateTimeList[$i+1];
+                }
+                $patient_hourly[] = $row;
+            }
+        }*/
+
+        $patient_hourly = [
+            "0" => ["00:00", "00:59"],
+            "1" => ["01:00", "01:59"],
+            "2" => ["02:00", "02:59"],
+            "3" => ["03:00", "03:59"],
+            "4" => ["04:00", "04:59"],
+            "5" => ["05:00", "05:59"],
+            "6" => ["06:00", "06:59"],
+            "7" => ["07:00", "07:59"],
+            "8" => ["08:00", "08:59"],
+            "9" => ["09:00", "09:59"],
+            "10" => ["10:00", "10:59"],
+            "11" => ["11:00", "11:59"],
+            "12" => ["12:00", "12:59"],
+            "13" => ["13:00", "13:59"],
+            "14" => ["14:00", "14:59"],
+            "15" => ["15:00", "15:59"],
+            "16" => ["16:00", "16:59"],
+            "17" => ["17:00", "17:59"],
+            "18" => ["18:00", "18:59"],
+            "19" => ["19:00", "19:59"],
+            "20" => ["20:00", "20:59"],
+            "21" => ["21:00", "21:59"],
+            "22" => ["22:00", "22:59"],
+            "23" => ["23:00", "23:59"],
+        ];
+
+        $adata = [];
+
+        foreach($patient_hourly as $key => $value){
+            $row = [];
+            $row['time_interval'] = $value[0].'-'.$value[1];
+            $query = "SELECT count(date) as `total_patient` FROM appointments as app where app.user_id = ".$user_id." AND app.is_joined = 1 AND DATE_FORMAT(updated_at,'%H:%i') BETWEEN '".$value[0]."' AND '".$value[1]."'; ";
+            $row['total_patient'] = DB::select($query);
+            $adata[] = $row;
+        }
+        
+        return response(['status' => 1,'data' => $adata]);
     }
 }
 
