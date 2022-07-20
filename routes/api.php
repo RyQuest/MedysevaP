@@ -179,6 +179,8 @@ Route::prefix('nict')->group(function () {
 
 Route::prefix('vle')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('profile',   [App\Http\Controllers\Api\Vle\UserController::class, 'profile']);
+    Route::post('profile/update',   [App\Http\Controllers\Api\Vle\UserController::class, 'profileUpdate']);    
 
     /* patientses */
     Route::post('patientses', 'Api\Vle\MainController@patientses');
@@ -191,7 +193,7 @@ Route::prefix('vle')->group(function () {
 
     Route::prefix('invoice')->group(function () {
         Route::post('/', [VleInvoiceController::class, 'vle_invoice']);
-        Route::post('/details/{id}', [VleInvoiceController::class, 'details']);
+        Route::post('details', [VleInvoiceController::class, 'details']);
     });
 
     Route::prefix('wallet')->group(function () {

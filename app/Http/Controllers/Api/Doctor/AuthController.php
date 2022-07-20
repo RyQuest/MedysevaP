@@ -10,6 +10,7 @@ use App\Models\UserKyc;
 use App\Models\UserBank;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use JWTAuth;
+use Config;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -25,7 +26,12 @@ class AuthController extends Controller
     public function __construct()
     {
         // $this->middleware('auth.jwt')->except('register','login','getState');
-         $this->guard = "api";
+        $this->guard = "api";
+        Config::set('jwt.user', User::class);
+        Config::set('auth.providers', ['users' => [
+            'driver' => 'eloquent',
+            'model' => User::class,
+        ]]);
     }
 
     public function register(Request $request)

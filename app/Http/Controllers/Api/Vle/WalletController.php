@@ -9,14 +9,15 @@ use App\Models\VleUser;
 use App\Models\WithdrawRequest;
 use Illuminate\Http\Request;
 use JWTAuth;
+use Config;
 
 class WalletController extends Controller
 {
     //
     public function __construct()
     {
-        \Config::set('jwt.user', VleUser::class);
-        \Config::set('auth.providers', ['users' => [
+        Config::set('jwt.user', VleUser::class);
+        Config::set('auth.providers', ['users' => [
             'driver' => 'eloquent',
             'model' => VleUser::class,
         ]]);
@@ -24,13 +25,19 @@ class WalletController extends Controller
 
     public function index(Request $request)
     {
-        $user = \JWTAuth::parseToken()->authenticate($request->token);
+        $user_id = $request->input('user_id');
+        $limit   = $request->input('limit');
+        $offset  = $request->input('offset');
+
+        $user = VleUser::find($request->input('user_id'));
         $data['wallet'] = UserWallet::where('user_id', $user->id)->where('user_role', 'vle')->first();
         $wallet_id = $data['wallet']->id;
         $history = TrHistory::where(function ($query) use ($wallet_id) {
             return $query->orWhere('from_wallet', $wallet_id)
                 ->orWhere('to_wallet', $wallet_id);
         })
+            ->take($limit)
+            ->skip($offset)
             ->latest()
             ->get();
 

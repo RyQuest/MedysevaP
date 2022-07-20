@@ -22,19 +22,25 @@ class InvoiceController extends Controller
     }
 
     public function vle_invoice(Request $request){
-        $user = \JWTAuth::parseToken()->authenticate($request->token);
+        // $user = \JWTAuth::parseToken()->authenticate($request->token);
+        $user_id = $request->input('user_id');
+        $limit = $request->input('limit');
+        $offset = $request->input('offset');
 
         $invoice = Invoices::select('invoices.*','patientses.name as patient_name')
         ->join('patientses','patientses.id','=','invoices.patient_id')
-        ->where('vle_id',$user->id)
-        ->where('invoice_type','manual_invoice')
+        ->where('created_by',$user_id)
+        ->whereOr('vle_id',$user_id)
+        ->take($limit)
+        ->skip($offset)
         ->groupBy('invoices.invoice_id')
         ->get();
 
         return response(['status' => 1,'data' => $invoice]);
     }
 
-    public function details($id){
+    public function details(Request $request){
+        $id = $request->input('invoice_id');
         $data['invoice'] = Invoices::where('id',$id)->first();
         $data['items'] = InvoiceItem::where('invoice_id',$data['invoice']->invoice_id)->get();
 

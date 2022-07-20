@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,9 +55,30 @@ Route::get('home',function(){
     // dd(\Auth::user());
 });
 
-Route::get('testemai',function(){
+Route::get('testmail',function(){
     $vleCreate = App\Models\VleUser::find(23);
     \Mail::to('ashishbanjare@questglt.com')->send(new App\Mail\VleRegister($vleCreate));
+});
+
+Route::get('testsms',function(){
+     
+    $key = "NGYzMzMxNGYzMTZhNGE2ZjcwNzk0NzQ4NmE3NzZiNmY=";
+
+    $apiKey = urlencode($key);
+
+    // Message details
+    $numbers = array(918818883436);
+    $sender = urlencode('600010');
+    $message = rawurlencode('This is your message');
+
+    $numbers = implode(',', $numbers);
+
+    // Prepare data for POST request
+    $data = array('apikey' => $apiKey, 'numbers' => $numbers, "sender" => $sender, "message" => $message,"test"=>true);
+    $response = Http::post('https://api.textlocal.in/send/',$data);
+
+    // Process your response here
+    echo $response;
 });
 
 Route::group(['middleware' => 'web'], function () {
