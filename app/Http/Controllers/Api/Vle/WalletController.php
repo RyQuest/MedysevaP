@@ -57,8 +57,8 @@ class WalletController extends Controller
     }
     public function withdrawRequest(Request $request)
     {
-        $user = \JWTAuth::parseToken()->authenticate($request->token);
-        $res = WithdrawRequest::where('user_id', $user->id)->where('user_role', 'vle')->get();
+        // $user = \JWTAuth::parseToken()->authenticate($request->token);
+        $res = WithdrawRequest::where('user_id', $request->input('user_id'))->where('user_role', 'vle')->get();
 
         return response(['status' => 1, 'data' => $res]);
     }
@@ -72,17 +72,18 @@ class WalletController extends Controller
             return response(['status' => 0, 'msg' => $validator->errors()->first()]);
         }
 
-        $user = JWTAuth::parseToken()->authenticate($request->get('token'));
-        $userAalletAmount = userAalletAmount($user->id, 'vle');
-        if ($userAalletAmount < $request->get('amount')) {
+        $user = VleUser::find($request->input('user_id'));
+        $user_wallet = UserWallet::where('user_id', $user->id)->where('user_role', 'vle')->first();
+        $userWalletAmount = $user_wallet->amount;
+        if ($userWalletAmount < $request->get('amount')) {
             return response(['status' => 0, 'msg' => 'Your wallet does not have sufficient balance']);
         }
         WithdrawRequest::create([
             'user_id' => $user->id,
             'user_role' => 'vle',
-            'wallet_id' => $userAalletAmount,
+            'wallet_id' => $userWalletAmount,
             'amount' => $request->get('amount'),
-            'current_amount' => $userAalletAmount
+            'current_amount' => $userWalletAmount
         ]);
 
         return response(['status' => 1, 'msg' => 'Request send successfully']);
