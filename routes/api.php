@@ -225,3 +225,4 @@ Route::prefix('staff')->group(function () {
 
 Route::post('join_us', [CompanyController::class, 'joinUs']);
 Route::post('contact_us', [CompanyController::class, 'contactUs']);
+Route::post('test/notification', [App\Http\Controllers\ApiController::class, 'testNotification']);

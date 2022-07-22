@@ -174,4 +174,24 @@ class ApiController extends Controller
     {
         //
     }
+
+    /**
+     * Test Notification*
+    */
+    public function testNotification(Request $request){
+        $firebaseToken = User::whereNotNull('device_token')
+                            ->where('device_token', '!=', '')
+                            ->where('device_token', '!=', '0')
+                            ->pluck('device_token')
+                            ->all();
+        $data = [
+            'firebaseToken' => $firebaseToken,
+            'title' => 'New Appointment has been arrised',
+            'body' => 'Hello Dr. there are new appointment booked, please check!',
+        ];
+
+        $res = sendNotification($data);
+
+        return json_encode(['status'=>1, 'data' => json_decode($res, true)]);
+    }
 }

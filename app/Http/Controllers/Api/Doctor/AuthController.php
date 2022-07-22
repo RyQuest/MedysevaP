@@ -179,7 +179,8 @@ class AuthController extends Controller
         }
 
         $user = User::where('email',$request->email)->first();
-        $user->device_token = "device_token";
+        $device_token = ($user->device_token) ? $user->device_token : '';
+        $user->device_token = ($request->input('device_id')) ? $request->input('device_id') : $device_token;
         $user->save();
 
         return response()->json([

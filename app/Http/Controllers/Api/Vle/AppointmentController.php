@@ -329,6 +329,33 @@ class AppointmentController extends Controller
         UserWallet::where('id', 4)->update(['amount' => $adminWalletAmt]);
         UserWallet::where('id', $vleUserWallet->id)->update(['amount'=> $vleUserWalletAmt]);
 
+
+        if($request->get('consultation_type') == 1){
+        // General Doctor list
+        $firebaseToken = User::whereNotNull('device_token')
+            ->where('device_token', '!=', '')
+            ->where('device_token', '!=', '0')
+            ->where('doctor_type', '0')
+            ->pluck('device_token')
+            ->all();
+        }else{
+            // special Doctor list
+            $firebaseToken = User::whereNotNull('device_token')
+                    ->where('device_token', '!=', '')
+                    ->where('device_token', '!=', '0')
+                    ->where('doctor_type', '1')
+                    ->pluck('device_token')
+                    ->all();
+
+        }
+        $data = [
+            'firebaseToken' => $firebaseToken,
+            'title' => 'New Appointment has been arrised',
+            'body' => 'Hello Dr. there are new appointment booked, please check!',
+        ];
+
+        $res = sendNotification($data);
+
         DB::commit();
 
         return response(['status' => 1, 'msg' => 'Appointment created successfully']);
