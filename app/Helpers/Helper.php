@@ -188,7 +188,7 @@ if (!function_exists('my_date_now')) {
     }
 }
 
- public function sendNotification(Request $request)
+ function sendNotification(Request $request)
     {
         $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
             
