@@ -42,9 +42,13 @@ class InvoiceController extends Controller
     public function details(Request $request){
         $id = $request->input('invoice_id');
         $data['invoice'] = Invoices::where('id',$id)->first();
-        $data['items'] = InvoiceItem::where('invoice_id',$data['invoice']->invoice_id)->get();
+        if(!empty($data['invoice'])){
+            $data['items'] = InvoiceItem::where('invoice_id',$data['invoice']->invoice_id)->get();
 
-        return response(['status' => 1,'data' => $data]);
+            return response(['status' => 1,'data' => $data]);
+        }else{
+            return response(['status' => 1,'data' => '']);
+        }
     }
     
 }
