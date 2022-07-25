@@ -192,6 +192,6 @@ class ApiController extends Controller
 
         $res = sendNotification($data);
 
-        return json_encode(['status'=>1, 'data' => json_decode($res, true)]);
+        return json_encode(['status'=>1, 'data' => $res]);
     }
 }
